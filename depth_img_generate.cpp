@@ -11,13 +11,15 @@
 #include <vector>
 #include <numeric> // for std::iota
 #include "LX_tools/nerf_pre.h"
+#include "PointCloudCart2Sph/PointCloudCart2Sph.h"
+
 #define MIN_DEPTH 0.5
 #define EPS 0.0001
 
+
 namespace fs = std::filesystem;
-typedef pcl::PointXYZRGBL PointT;
-float rad_resolution = 0.2;
-float height_resolution = 0.02;
+float rad_resolution = 0.001;
+float height_resolution = 0.001;
 float max_height = 2;
 float min_height = -1;
 struct pointcloud_map_in_cam
@@ -31,50 +33,6 @@ struct pointcloud_map_in_cam
     cv::Mat pointcloud_map_in_cam_mat = cv::Mat(Mat_height, Mat_width, CV_32FC1, cv::Scalar(0));
     
 };
-void test(pcl::PointCloud<pcl::PointXYZRGBL>::Ptr pointcloud){
-    pointcloud_map_in_cam A;
-    for(auto &point : pointcloud->points){
-        
-    }
-}
-
-int get_point_height_index_in_Mat_height(const PointT &point){
-    int height ;
-    if(point.y <0 )height = -point.y;
-    else height = point.y;
-    if(height > 0 ) height = height + max_height;
-    else height = height - min_height;
-    if(height < 0 or height > (max_height - min_height)) return false;
-
-    return height/height_resolution;
-
-}
-
-int get_point_rad_index_in_Mat_width(const PointT &point,const Eigen::Matrix4d &pose_matrix){
-    Eigen::Vector3d point_xyz;
-    point_xyz << point.x, point.y, point.z;
-    point_xyz = point_xyz.normalized();
-    Eigen:: Vector3d ZAxis ;//因为Z为深度方向
-    ZAxis.x() = pose_matrix(2,0);
-    ZAxis.y() = pose_matrix(2,1);
-    ZAxis.z() = pose_matrix(2,2);
-    ZAxis = ZAxis.normalized();
-
-    Eigen:: Vector3d Y_axis ;//确定顺时逆时针方向
-    Y_axis.x() = pose_matrix(1,0);
-    Y_axis.y() = pose_matrix(1,1);
-    Y_axis.z() = pose_matrix(1,2);
-    Y_axis = Y_axis.normalized();
-    double dotProduct = point_xyz.dot(ZAxis);
-    double cosTheta = std::clamp(dotProduct, -1.0, 1.0);
-    Eigen::Vector3d crossProduct = point_xyz.cross(ZAxis);
-    double direction = crossProduct.dot(Y_axis);
-    double angle = std::atan2(crossProduct.norm(), dotProduct);
-    if (direction < 0) {
-        angle = 2 * M_PI - angle;
-    }
-    return angle/rad_resolution;
-}
 // {
 //     /* data */
 // };
@@ -118,39 +76,151 @@ int main(int argc, char** argv) {
         //     transform_list.push_back(matrixf);
         // }
         
-        std::map<int, pcl::PointCloud<pcl::PointXYZRGBL>::Ptr> pointcloud_list_map=nerf_pre.run(cloud_path, 0.0001, poe_list_temp);
-        pcl::PointCloud<pcl::PointXYZRGBL>::Ptr all_points(new pcl::PointCloud<pcl::PointXYZRGBL>);
-        for(auto it = pointcloud_list_map.begin(); it != pointcloud_list_map.end(); it++){
-            pcl::PointCloud<pcl::PointXYZRGBL>::Ptr cloud_temp = it->second;
+        // std::map<int, pcl::PointCloud<pcl::PointXYZRGBL>::Ptr> pointcloud_list_map=nerf_pre.run(cloud_path, 0.0001, poe_list_temp);
+        // for(auto pose : poe_list_temp){
+        //     Eigen::Matrix4f posef = pose.cast<float>();
+        //     transform_list.push_back(posef);
+        // }
+        // pcl::PointCloud<PointT>::Ptr all_points(new pcl::PointCloud<pcl::PointXYZRGBL>);
+        // for(auto it = pointcloud_list_map.begin(); it != pointcloud_list_map.end(); it++){
+        //     pcl::PointCloud<pcl::PointXYZRGBL>::Ptr cloud_temp = it->second;
             
-            for(auto& point : cloud_temp->points){
-                PointT point_xyz;
-                point_xyz.x = point.x;
-                point_xyz.y = point.y;
-                point_xyz.z = point.z;
-                point_xyz.r = point.r;
-                point_xyz.g = point.g;
-                point_xyz.b = point.b;
-                point_xyz.label = point.label;
-                // all_points->points.push_back(point);
-                cloud->points.push_back(point_xyz);
+        //     for(auto& point : cloud_temp->points){
+        //         PointT point_xyz;
+        //         point_xyz.x = point.x;
+        //         point_xyz.y = point.y;
+        //         point_xyz.z = point.z;
+        //         point_xyz.r = point.r;
+        //         point_xyz.g = point.g;
+        //         point_xyz.b = point.b;
+        //         point_xyz.label = point.label;
+        //         // all_points->push_back(point);
+        //         cloud->push_back(point_xyz);
+        //     }
+        // }
+
+        auto pointcloud_list_map_ = nerf_pre.run(cloud_path, 0.0001, poe_list_temp);
+        for(auto& pointcloud : pointcloud_list_map_){
+            for(auto& point : pointcloud->points){
+                cloud->emplace_back(point);
             }
         }
-        for(auto& matrix : poe_list_temp){
-            Eigen::Matrix4f matrixf = matrix.cast<float>();
-            transform_list.push_back(matrixf);
+        
+        // pcl::PointCloud<pcl::PointXYZRGBL>::Ptr pointcloud_list_map=nerf_pre.run2(cloud_path, poe_list_temp);
+        // *cloud = *pointcloud_list_map;
+
+        // int pic_num = 0;
+        // std::cout<<"cloud size "<<cloud->points.size()<<std::endl;  
+        // for(auto pose : poe_list_temp){
+        //     Eigen::Matrix4f posef = pose.cast<float>();
+        //     transform_list.push_back(posef);
+        // }
+        // PointCloudCart2Sph pointcloud_cart2sph(cloud, transform_list[0], rad_resolution, height_resolution);
+        // std::cout<<"pointcloud_cart2sph init done"<<std::endl;
+        // pointcloud_cart2sph.run(pic_num);
+        // Eigen::Matrix4f last_pose = transform_list[0];
+        // pic_num++;
+        // for(pic_num;pic_num < transform_list.size();pic_num++){
+        //     auto curr_pose = transform_list[pic_num];
+        //     auto relative_pose = curr_pose.inverse()*last_pose;
+        //     pointcloud_cart2sph.update_pointcloud(relative_pose);
+        //     pointcloud_cart2sph.run(pic_num);
+        //     // pic_num++;
+        //     last_pose = curr_pose;
+        // }
+
+        int pic_num = 0;
+        std::cout<<"cloud size "<<cloud->points.size()<<std::endl;  
+        for(auto pose : poe_list_temp){
+            Eigen::Matrix4f posef = pose.cast<float>();
+            transform_list.push_back(posef);
         }
+        // ///test
+        // for(auto pose : transform_list){
+        //     pcl::PointCloud<PointT>::Ptr test(new pcl::PointCloud<PointT>);
+        //     auto start = std::chrono::high_resolution_clock::now();
+
+        //     pcl::transformPointCloud(*cloud, *test, pose);
+        //     auto end = std::chrono::high_resolution_clock::now();
+        //     std::cout<<"transformPointCloud spend time "<<std::chrono::duration_cast<std::chrono::milliseconds> (end - start).count()<<" ms"<<std::endl;
+        // }
+        // return -1;
+        // ///test
+        PointCloudCart2Sph pointcloud_cart2sph(cloud, transform_list[0], rad_resolution, height_resolution);
+        // std::cout<<"pointcloud_cart2sph init done"<<std::endl;
+        // pointcloud_cart2sph.run(pic_num);
+        Eigen::Matrix4f last_pose = transform_list[0];
+        pcl::PointCloud<pcl::PointXYZRGBL>::Ptr init_frame = pointcloud_list_map_[0];
+        std::cout<<"init_frame size "<<init_frame->points.size()<<std::endl;
+        pointcloud_cart2sph.get_curr_frame_pointcloud(init_frame, last_pose);
+        std::cout<<"get_curr_frame_pointcloud "<<std::endl;
+        // pointcloud_cart2sph.delete_virual_pointcloud();
+        pointcloud_cart2sph.high_delete_virual_pointcloud();
+        std::cout<<"delete_virual_pointcloud "<<std::endl;
+        init_frame->clear();
+        //初始化结束：全局点云的获取、构造PointCloudCart2Sph类，进行第一帧点云的处理
+        pic_num++;
+        for(pic_num;pic_num < transform_list.size();pic_num++){
+            std::cout<<"pic_num "<<pic_num<<std::endl;
+
+            auto curr_pose = transform_list[pic_num];auto curr_frame = pointcloud_list_map_[pic_num];
+
+            auto start = std::chrono::high_resolution_clock::now();
+
+            // auto relative_pose = curr_pose*last_pose.inverse();
+            // pointcloud_cart2sph.update_pointcloud(relative_pose);
+            pointcloud_cart2sph.update_pointcloud2(curr_pose);
+            auto end0 = std::chrono::high_resolution_clock::now();
+            auto duration0 = std::chrono::duration_cast<std::chrono::milliseconds> (end0 - start);
+
+            pointcloud_cart2sph.get_curr_frame_pointcloud(curr_frame, curr_pose);
+            auto end1 = std::chrono::high_resolution_clock::now();
+            auto duration1 = std::chrono::duration_cast<std::chrono::milliseconds> (end1 - end0);
+
+            // pointcloud_cart2sph.delete_virual_pointcloud();
+            pointcloud_cart2sph.high_delete_virual_pointcloud();
+            auto end2 = std::chrono::high_resolution_clock::now();
+            auto duration2 = std::chrono::duration_cast<std::chrono::milliseconds> (end2 - end1);
+            last_pose = curr_pose;
+
+            std::cout<<"update_pointcloud spend time "<<duration0.count()<<" ms"<<std::endl;
+            std::cout<<"get_curr_frame_pointcloud spend time "<<duration1.count()<<" ms"<<std::endl;
+            std::cout<<"delete_virual_pointcloud spend time "<<duration2.count()<<" ms"<<std::endl;
+            if(pic_num == 10) break;
+        }
+        auto filter_point = pointcloud_cart2sph.get_result_pointcloud();
+        std::string path_save ="/home/mt_eb1/LYX/filter_noise_point/Table/";
+        pcl::transformPointCloud(*filter_point[1], *filter_point[1], last_pose.inverse());
+        pcl::io::savePLYFile(path_save+"ori.ply", *filter_point[1]);
+        cloud->clear();
+        pcl::transformPointCloud(*filter_point[0], *filter_point[0], last_pose.inverse());
+        pcl::io::savePLYFile(path_save+"filter_point.ply", *filter_point[0]);
+        return -1;
+        // pcl::io::savePLYFileASCII((base_dir / "tf_ori.ply").string(), *cloud);
+        // return -1;
+        // for(auto& matrix : poe_list_temp){
+        //     Eigen::Matrix4f matrixf = matrix.cast<float>();
+        //     transform_list.push_back(matrixf);
+        // }
         std::cout<<"trans lx done"<<std::endl;
         //保存点云来观测
-        // all_points->width = all_points->points.size();
-        // all_points->height = 1;
-        // Eigen::Affine3f tf_X = Eigen::Affine3f::Identity();Eigen::Affine3f tf_Z = Eigen::Affine3f::Identity();
-        // Eigen::Matrix3f rotation_Y = Eigen::AngleAxisf(-M_PI / 2.0f, Eigen::Vector3f::UnitY()).matrix(); // 绕Z轴旋转90度
-        // Eigen::Matrix3f rotation_Z = Eigen::AngleAxisf(M_PI / 2.0f, Eigen::Vector3f::UnitZ()).matrix(); // 绕Z轴旋转90度
+        // pcl::PointCloud<pcl::PointXYZRGBL>::Ptr tmep_points(new pcl::PointCloud<pcl::PointXYZRGBL>);
+
+        // Eigen::Affine3f tf_Y = Eigen::Affine3f::Identity();Eigen::Affine3f tf_Z = Eigen::Affine3f::Identity();
+        // Eigen::Matrix3f rotation_Y = Eigen::AngleAxisf(-M_PI / 2.0f, Eigen::Vector3f::UnitY()).matrix();
+        // Eigen::Matrix3f rotation_Z = Eigen::AngleAxisf(M_PI / 2.0f, Eigen::Vector3f::UnitZ()).matrix(); 
+        // tf_Y.rotate(rotation_Y);
+        // pcl::transformPointCloud(*all_points, *tmep_points, tf_Y);
+        // pcl::io::savePLYFileASCII((base_dir / "tf_Y.ply").string(), *tmep_points);
+        // tf_Z.rotate(rotation_Z);
+        // pcl::transformPointCloud(*all_points, *tmep_points, tf_Z);
+        // pcl::io::savePLYFileASCII((base_dir / "tf_Z.ply").string(), *tmep_points);
         // auto rota_ZY = rotation_Z * rotation_Y;
-        // tf_X.rotate(rota_ZY);
-        // pcl::io::savePCDFileASCII((base_dir / "all_points.pcd").string(), *all_points);
-        // pcl::transformPointCloud(*all_points, *all_points, tf_X);
+        // Eigen::Affine3f tf_ZY = Eigen::Affine3f::Identity();
+        // tf_ZY.rotate(rota_ZY);
+        // pcl::transformPointCloud(*all_points, *tmep_points, tf_ZY);
+        // pcl::io::savePLYFileASCII((base_dir / "rota_ZY.ply").string(), *tmep_points);
+        // return -1;
         // pcl::io::savePCDFileASCII((base_dir / "rota_ZYall_points_.pcd").string(), *all_points);
 
     }

@@ -136,7 +136,7 @@ class NERF_PRE
     //                 pcl::PointXYZRGBL & reprojected_point);
     // int undistort_imgs(double, const unsigned int);
     
-    std::map<int, pcl::PointCloud<pcl::PointXYZRGBL>::Ptr> run(std::string lx_file_name, float downsample_size,std::vector<Eigen::Matrix4d> &pose_list);
+    std::vector<pcl::PointCloud<pcl::PointXYZRGBL>::Ptr> run(std::string lx_file_name, float downsample_size,std::vector<Eigen::Matrix4d> &pose_list);
     pcl::PointCloud<pcl::PointXYZRGBL>::Ptr run2(std::string lx_file_name,std::vector<Eigen::Matrix4d> &pose_list);
 };
 

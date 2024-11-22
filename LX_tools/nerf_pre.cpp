@@ -16,9 +16,9 @@
 
 #include "lx_tools.h"
 
-std::map<int, pcl::PointCloud<pcl::PointXYZRGBL>::Ptr> NERF_PRE::run(std::string lx_file_name, float downsample_size, std::vector<Eigen::Matrix4d> &pose_list)
+std::vector<pcl::PointCloud<pcl::PointXYZRGBL>::Ptr> NERF_PRE::run(std::string lx_file_name, float downsample_size, std::vector<Eigen::Matrix4d> &pose_list)
 {
-    std::map<int, pcl::PointCloud<pcl::PointXYZRGBL>::Ptr> temp;
+    std::unordered_map<int, pcl::PointCloud<pcl::PointXYZRGBL>::Ptr> temp;
     printf("start offline render develop.\n");
     auto start_t = clock();
     std::vector<pcl::PointXYZRGBL> pclPointsVec;
@@ -46,18 +46,19 @@ std::map<int, pcl::PointCloud<pcl::PointXYZRGBL>::Ptr> NERF_PRE::run(std::string
 
     if (!bf) {
         std::cout << "readSumFile failed" << std::endl;
-        return temp;
+        std::vector<pcl::PointCloud<pcl::PointXYZRGBL>::Ptr> A;
+        return A;
     }
     printf ("LX points contains: %d, used time: %0.4lf s\n", pointsVec.size(), (double)(clock() - readStart) / (CLOCKS_PER_SEC));
     pcl::PointCloud<pcl::PointXYZRGBL>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZRGBL>);
     pcl::PointCloud<pcl::PointXYZRGBL>::Ptr cloud_(new pcl::PointCloud<pcl::PointXYZRGBL>);
     cloud->points.reserve(pointsVec.size());
+    
     for (int i = 0; i < pclPointsVec.size(); ++i)
     {
         // if (abs(pclPointsVec[i].x) > 13.0 && abs(pclPointsVec[i].x) < 22.0 && (pclPointsVec[i].y) > 5.0 && abs(pclPointsVec[i].z) < 2.0)
         if (pclPointsVec[i].label < cam_pose.size())
             cloud->points.push_back(pclPointsVec[i]);
-            cloud_->points.push_back(pclPointsVec[i]);
     }
     unsigned int cloud_num = cloud->points.size();
     start_t = clock();printf("start downsample the cloud, downsample size %f...\n", downsample_size);
@@ -75,7 +76,7 @@ std::map<int, pcl::PointCloud<pcl::PointXYZRGBL>::Ptr> NERF_PRE::run(std::string
     // *cloud_filtered = *cloud_;
     std::cout<<"cloud_ size "<<cloud->points.size()<<std::endl;
     std::cout<<"cloud_filtered size "<<cloud_filtered->points.size()<<std::endl;
-    std::map<int, pcl::PointCloud<pcl::PointXYZRGBL>::Ptr> map;
+    std::unordered_map<int, pcl::PointCloud<pcl::PointXYZRGBL>::Ptr> map;
     for(auto const &point : cloud_filtered->points)
     {
         int label = point.label;
@@ -87,10 +88,24 @@ std::map<int, pcl::PointCloud<pcl::PointXYZRGBL>::Ptr> NERF_PRE::run(std::string
         }
         map[label]->push_back(point);
     }
+    std::map<int, pcl::PointCloud<pcl::PointXYZRGBL>::Ptr > make_unordered_map_order;
+    for(auto it = map.begin(); it != map.end(); it++)
+    {
+        make_unordered_map_order[it->first] = it->second;
+    }
+    std::vector<Eigen::Matrix4d> pose_for_unordered_map;
+    std::vector<pcl::PointCloud<pcl::PointXYZRGBL>::Ptr> pointcloud_list;
+    for(auto it = make_unordered_map_order.begin(); it != make_unordered_map_order.end(); it++)
+    {
+        std::cout<<"label "<<it->first<<std::endl;
+        std::cout<<"pointcloud size "<<it->second->points.size()<<std::endl;    
+        pose_for_unordered_map.emplace_back(cam_pose[it->first]);
+        pointcloud_list.emplace_back(it->second);
+    }
     std::vector<Eigen::Vector3d> poe_list;
-    pose_list = cam_pose;
+    pose_list = pose_for_unordered_map;
     std::cout<<"read lx done"<<std::endl;
-    return map;
+    return pointcloud_list;
 
 }
 
@@ -135,7 +150,7 @@ pcl::PointCloud<pcl::PointXYZRGBL>::Ptr NERF_PRE::run2(std::string lx_file_name,
         // if (abs(pclPointsVec[i].x) > 13.0 && abs(pclPointsVec[i].x) < 22.0 && (pclPointsVec[i].y) > 5.0 && abs(pclPointsVec[i].z) < 2.0)
         if (pclPointsVec[i].label < cam_pose.size())
             cloud->points.push_back(pclPointsVec[i]);
-            cloud_->points.push_back(pclPointsVec[i]);
+            // cloud_->points.push_back(pclPointsVec[i]);
     }
     unsigned int cloud_num = cloud->points.size();
     // start_t = clock();printf("start downsample the cloud, downsample size %f...\n", downsample_size);

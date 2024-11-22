@@ -20,7 +20,8 @@ target_link_libraries(voxel_filter ${PCL_LIBRARIES})
 add_executable(depth_img_generate
                depth_img_generate.cpp
                     LX_tools/nerf_pre.cpp 
-                    LX_tools/lx_tool.cpp)
+                    LX_tools/lx_tool.cpp
+                    PointCloudCart2Sph/PointCloudCart2Sph.cpp)
 target_link_libraries(depth_img_generate ${PCL_LIBRARIES} ${OpenCV_LIBS} -ltbb -lcrypto)
 
 
