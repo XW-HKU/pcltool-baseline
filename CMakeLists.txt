@@ -21,7 +21,8 @@ add_executable(depth_img_generate
                depth_img_generate.cpp
                     LX_tools/nerf_pre.cpp 
                     LX_tools/lx_tool.cpp
-                    PointCloudCart2Sph/PointCloudCart2Sph.cpp)
+                    PointCloudCart2Sph/PointCloudCart2Sph.cpp
+                    SmoothPointCloud/SmoothPointCloud.cpp)
 target_link_libraries(depth_img_generate ${PCL_LIBRARIES} ${OpenCV_LIBS} -ltbb -lcrypto)
 
 

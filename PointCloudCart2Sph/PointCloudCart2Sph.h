@@ -1,5 +1,4 @@
 #pragma once
-#include <pcl/io/pcd_io.h>
 #include <pcl/point_types.h>
 #include <pcl/common/common.h>
 #include <pcl/common/transforms.h>
@@ -9,6 +8,9 @@
 #include <vector>
 #include <numeric> // for std::iota
 #include <eigen3/Eigen/Dense>
+#include <pcl/io/ply_io.h>
+#include <atomic>
+
 typedef pcl::PointXYZRGBL PointT;
 
 struct pointXYZRGBHM{
@@ -44,91 +46,63 @@ class PointCloudCart2Sph{
         double eps = 0.00000001;
         struct Sphgrid{
             bool occupied = false;
-            int theta_index;
-            int phi_index;
+            int index = 0;
+            int size = 0;
+            //test
+            float x = 0;
+            float y = 0;
+            float z = 0;
+            //test
             std::vector<pointXYZRGBHM* > points;
-            Sphgrid(int theta_index_, int phi_index_):theta_index(theta_index_), phi_index(phi_index_){}    
+            Sphgrid(int index_):index(index_){}    
             bool operator==(const Sphgrid& other) const {
-                return theta_index == other.theta_index && phi_index == other.phi_index;
+                return index == other.index ;
                 }
-            float depth;
+            float bar_depth=0;
+            float max_depth=-1;
+            float min_depth=999999;
         };
-        
-        void compute_Sphgrid_depth(std::vector<PointCloudCart2Sph::Sphgrid> &sphgrid);
-        // cv::Mat depth_image_show = cv::Mat(height, width, CV_8UC1, cv::Scalar(0));
-        cv::Mat get_depth_image_show(std::vector<PointCloudCart2Sph::Sphgrid> &sphgrid);
-        std::unordered_map<int, std::string> umap;
-        PointCloudCart2Sph(pcl::PointCloud<PointT>::Ptr &pointcloud_, Eigen::Matrix4f &pose_matrix_, float theta_resolution_, float phi_resolution_){
-            std::cout<<"pointcloud_cart2sph init"<<std::endl;
-            theta_resolution = theta_resolution_;
-            phi_resolution = phi_resolution_;
-            pose_matrix = pose_matrix_;
-            XAxis = pose_matrix.block<3,1>(0,0);
-            YAxis = pose_matrix.block<3,1>(0,1);
-            ZAxis = pose_matrix.block<3,1>(0,2);
-            displacement = pose_matrix.block<3,1>(0,3);
-            ori_pointcloud = pointcloud_;
-            pcl::PointCloud<PointT>::Ptr out(new pcl::PointCloud<PointT>);
-            std::cout<<"pointcloud_ size "<<pointcloud_->points.size()<<std::endl;
-            pcl::transformPointCloud(*ori_pointcloud, *out, pose_matrix);
-            // pointcloud = pcl::PointCloud<PointT>::Ptr(new pcl::PointCloud<PointT>);
-            // *pointcloud = *pointcloud_;
-            for(auto & point : out->points){
-                pointcloud.emplace_back(pointXYZRGBHM(point));
+
+        PointCloudCart2Sph(std::vector<pcl::PointCloud<PointT>::Ptr> &pointcloud_list_, std::vector<Eigen::Matrix4f> &pose_matrix_, float theta_resolution_, float phi_resolution_){
+            ori_pointcloud_list = pointcloud_list_;pose_matrix = pose_matrix_;theta_resolution = theta_resolution_;phi_resolution = phi_resolution_;
+            theta_size = 2*M_PI/theta_resolution+eps;phi_size = M_PI/phi_resolution+eps;
+            ori_pointcloudIndex_pointIndex_status.resize(ori_pointcloud_list.size());
+            for(int ori_pointcloud_index =0 ;ori_pointcloud_index<ori_pointcloud_list.size();ori_pointcloud_index++){
+                int ori_pointcloud_size = ori_pointcloud_list[ori_pointcloud_index]->points.size();
+                for(int ori_point_index = 0;ori_point_index < ori_pointcloud_size;ori_point_index++){
+                    ori_pointcloudIndex_pointIndex_status[ori_pointcloud_index].push_back(0);
+                }
             }
 
-            theta_size = 2*M_PI/theta_resolution+eps;
-            phi_size = M_PI/phi_resolution+eps;
-            std::cout<<"pointcloud_ size "<<pointcloud_->points.size()<<std::endl;
-            std::cout<<"test_pointcloud_ "<<pointcloud.size()<<std::endl;
         }
-        
-        std::vector<Sphgrid> local_pointcloud_sphgrid();
-        std::vector<Sphgrid> curr_frame_pointcloud_sphgrid();
+        float get_point_in_sph_theta(const PointT& point);
+        float get_point_in_sph_phi(const PointT& point);
+        float get_point_in_sph_r(const PointT& point); 
+        int get_point_in_sph_theta_index(const PointT& point){
+            float theta = get_point_in_sph_theta(point);
+            return theta/theta_resolution+eps;
+        }
+        int get_point_in_sph_phi_index(const PointT& point){
+            float phi = get_point_in_sph_phi(point);
+            return phi/phi_resolution+eps;
+        }
         int index_in_vector_of_sphgrid(const float &theta, const float &phi){
             int theta_index = theta/theta_resolution+eps;
             int phi_index = phi/phi_resolution+eps;
             return phi_index*theta_size + theta_index;
-        }
-        float get_point_in_sph_theta(const pointXYZRGBHM& point);
-        float get_point_in_sph_phi(const pointXYZRGBHM& point);
-        float get_point_in_sph_r(const pointXYZRGBHM& point);
+        } 
 
-        void  update_pointcloud(const Eigen::Matrix4f &relative_pose){
-            for(auto & point : pointcloud){
-                point.xyz = relative_pose*point.xyz;
-                point.xyz.w() = 1;
-            }
-        }
-        void  update_pointcloud2(const Eigen::Matrix4f &curr_pose){
-            pcl::PointCloud<PointT>::Ptr out(new pcl::PointCloud<PointT>);
-            pcl::transformPointCloud(*ori_pointcloud, *out, curr_pose);
-            if(out->points.size() != pointcloud.size()){
-                std::cout<<"pointcloud size not equal"<<std::endl;
-            }
-            for(int i=0;i<out->points.size();i++){
-                pointcloud[i].xyz = Eigen::Vector4f(out->points[i].x, out->points[i].y, out->points[i].z, 1);
-            }
-        }
-
-        void get_curr_frame_pointcloud(pcl::PointCloud<PointT>::Ptr curr_frame,const Eigen::Matrix4f &curr_pose);
-
-        void run(int picture_num);
+        std::vector<Sphgrid> curr_frame_pointcloud_sphgrid(pcl::PointCloud<PointT>::Ptr& curr_frame);
+        // cv::Mat PointCloudCart2Sph::get_depth_image_show();
+        void get_depth_image_show();
         void delete_virual_pointcloud();
-        std::vector<pcl::PointCloud<PointT>::Ptr> get_result_pointcloud();
-        void high_delete_virual_pointcloud();
-        std::vector<pcl::PointCloud<PointT>::Ptr> get_result_pointcloud2();
-    private:
-        std::vector<pointXYZRGBHM> pointcloud;//已变换到curr_frame坐标系下
-        std::vector<pointXYZRGBHM> curr_frame_pointcloud;
-        std::vector<pointXYZRGBHM> filter_pointcloud;
-        pcl::PointCloud<PointT>::Ptr ori_pointcloud;
+        void save_pointcloud();
 
-        Eigen::Matrix4f pose_matrix;
-        Eigen::Vector3f XAxis;
-        Eigen::Vector3f YAxis;
-        Eigen::Vector3f ZAxis;
-        Eigen::Vector3f displacement;
+    private:
+        std::vector<pcl::PointCloud<PointT>::Ptr> ori_pointcloud_list;
+        std::vector<std::vector<std::atomic<int>>> ori_pointcloudIndex_pointIndex_status;
+        std::vector<Eigen::Matrix4f> pose_matrix;
+        Eigen::Matrix4f recover_pose;
         float theta_resolution;
         float phi_resolution;
         int theta_size;

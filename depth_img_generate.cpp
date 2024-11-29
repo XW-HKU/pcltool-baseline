@@ -12,24 +12,27 @@
 #include <numeric> // for std::iota
 #include "LX_tools/nerf_pre.h"
 #include "PointCloudCart2Sph/PointCloudCart2Sph.h"
-
+#include "SmoothPointCloud/SmoothPointCloud.h"
 #define MIN_DEPTH 0.5
 #define EPS 0.0001
 
 
 namespace fs = std::filesystem;
-float rad_resolution = 0.001;
-float height_resolution = 0.001;
+float theta_resoluton = 0.5;//角度制下的分辨率
+float rad_resolution = theta_resoluton*M_PI/180;
+float alpha_resolution = theta_resoluton*M_PI/180;
+// float rad_resolution = 0.001;
+// float alpha_resolution = 0.001;
 float max_height = 2;
 float min_height = -1;
 struct pointcloud_map_in_cam
 {
     // float rad_resolution = 0.2;
-    // float height_resolution = 0.02;
+    // float alpha_resolution = 0.02;
     // float max_height = 2;
     // float min_height = -1;
     int Mat_width =  M_PI/rad_resolution;
-    int Mat_height = (max_height - min_height)/height_resolution;
+    int Mat_height = (max_height - min_height)/alpha_resolution;
     cv::Mat pointcloud_map_in_cam_mat = cv::Mat(Mat_height, Mat_width, CV_32FC1, cv::Scalar(0));
     
 };
@@ -55,80 +58,14 @@ int main(int argc, char** argv) {
     pcl::PointCloud<PointT>::Ptr cloud(new pcl::PointCloud<PointT>);
 
     if(read_lx){
-        
         std::vector<Eigen::Matrix4d> poe_list_temp;
         NERF_PRE nerf_pre;
         std::vector<std::string> parts;
         std::string part;
-        // pcl::PointCloud<pcl::PointXYZRGBL>::Ptr all_points(new pcl::PointCloud<pcl::PointXYZRGBL>);
-        // pcl::PointCloud<pcl::PointXYZRGBL>::Ptr pointcloud_list_map=nerf_pre.run2(cloud_path, poe_list_temp);
-        // std::cout<<"read lx done"<<std::endl;
-        // for(auto & point : pointcloud_list_map->points){
-        //     PointT point_xyz;
-        //     point_xyz.x = point.x;
-        //     point_xyz.y = point.y;
-        //     point_xyz.z = point.z;
-        //     cloud->points.push_back(point_xyz);
-        //     all_points->points.push_back(point);
-        // }
-        // for(auto& matrix : poe_list_temp){
-        //     Eigen::Matrix4f matrixf = matrix.cast<float>();
-        //     transform_list.push_back(matrixf);
-        // }
-        
-        // std::map<int, pcl::PointCloud<pcl::PointXYZRGBL>::Ptr> pointcloud_list_map=nerf_pre.run(cloud_path, 0.0001, poe_list_temp);
-        // for(auto pose : poe_list_temp){
-        //     Eigen::Matrix4f posef = pose.cast<float>();
-        //     transform_list.push_back(posef);
-        // }
-        // pcl::PointCloud<PointT>::Ptr all_points(new pcl::PointCloud<pcl::PointXYZRGBL>);
-        // for(auto it = pointcloud_list_map.begin(); it != pointcloud_list_map.end(); it++){
-        //     pcl::PointCloud<pcl::PointXYZRGBL>::Ptr cloud_temp = it->second;
-            
-        //     for(auto& point : cloud_temp->points){
-        //         PointT point_xyz;
-        //         point_xyz.x = point.x;
-        //         point_xyz.y = point.y;
-        //         point_xyz.z = point.z;
-        //         point_xyz.r = point.r;
-        //         point_xyz.g = point.g;
-        //         point_xyz.b = point.b;
-        //         point_xyz.label = point.label;
-        //         // all_points->push_back(point);
-        //         cloud->push_back(point_xyz);
-        //     }
-        // }
-
+        auto t0 = std::chrono::high_resolution_clock::now();
         auto pointcloud_list_map_ = nerf_pre.run(cloud_path, 0.0001, poe_list_temp);
-        for(auto& pointcloud : pointcloud_list_map_){
-            for(auto& point : pointcloud->points){
-                cloud->emplace_back(point);
-            }
-        }
-        
-        // pcl::PointCloud<pcl::PointXYZRGBL>::Ptr pointcloud_list_map=nerf_pre.run2(cloud_path, poe_list_temp);
-        // *cloud = *pointcloud_list_map;
-
-        // int pic_num = 0;
-        // std::cout<<"cloud size "<<cloud->points.size()<<std::endl;  
-        // for(auto pose : poe_list_temp){
-        //     Eigen::Matrix4f posef = pose.cast<float>();
-        //     transform_list.push_back(posef);
-        // }
-        // PointCloudCart2Sph pointcloud_cart2sph(cloud, transform_list[0], rad_resolution, height_resolution);
-        // std::cout<<"pointcloud_cart2sph init done"<<std::endl;
-        // pointcloud_cart2sph.run(pic_num);
-        // Eigen::Matrix4f last_pose = transform_list[0];
-        // pic_num++;
-        // for(pic_num;pic_num < transform_list.size();pic_num++){
-        //     auto curr_pose = transform_list[pic_num];
-        //     auto relative_pose = curr_pose.inverse()*last_pose;
-        //     pointcloud_cart2sph.update_pointcloud(relative_pose);
-        //     pointcloud_cart2sph.run(pic_num);
-        //     // pic_num++;
-        //     last_pose = curr_pose;
-        // }
-
+        auto t1 = std::chrono::high_resolution_clock::now();
+        std::cout<<"nerf_pre spend time "<<std::chrono::duration_cast<std::chrono::milliseconds> (t1 - t0).count()<<" ms"<<std::endl;
         int pic_num = 0;
         std::cout<<"cloud size "<<cloud->points.size()<<std::endl;  
         for(auto pose : poe_list_temp){
@@ -146,55 +83,60 @@ int main(int argc, char** argv) {
         // }
         // return -1;
         // ///test
-        PointCloudCart2Sph pointcloud_cart2sph(cloud, transform_list[0], rad_resolution, height_resolution);
+        auto start = std::chrono::high_resolution_clock::now();
+        PointCloudCart2Sph pointcloud_cart2sph(pointcloud_list_map_, transform_list, rad_resolution, alpha_resolution);
+        pointcloud_cart2sph.delete_virual_pointcloud();
+        // pointcloud_cart2sph.get_depth_image_show();
+        auto end = std::chrono::high_resolution_clock::now();
+        std::cout<<"pointcloud_cart2sph init spend time "<<std::chrono::duration_cast<std::chrono::milliseconds> (end - start).count()<<" ms"<<std::endl;
         // std::cout<<"pointcloud_cart2sph init done"<<std::endl;
         // pointcloud_cart2sph.run(pic_num);
-        Eigen::Matrix4f last_pose = transform_list[0];
-        pcl::PointCloud<pcl::PointXYZRGBL>::Ptr init_frame = pointcloud_list_map_[0];
-        std::cout<<"init_frame size "<<init_frame->points.size()<<std::endl;
-        pointcloud_cart2sph.get_curr_frame_pointcloud(init_frame, last_pose);
-        std::cout<<"get_curr_frame_pointcloud "<<std::endl;
-        // pointcloud_cart2sph.delete_virual_pointcloud();
-        pointcloud_cart2sph.high_delete_virual_pointcloud();
-        std::cout<<"delete_virual_pointcloud "<<std::endl;
-        init_frame->clear();
-        //初始化结束：全局点云的获取、构造PointCloudCart2Sph类，进行第一帧点云的处理
-        pic_num++;
-        for(pic_num;pic_num < transform_list.size();pic_num++){
-            std::cout<<"pic_num "<<pic_num<<std::endl;
+        // Eigen::Matrix4f last_pose = transform_list[0];
+        // pcl::PointCloud<pcl::PointXYZRGBL>::Ptr init_frame = pointcloud_list_map_[0];
+        // std::cout<<"init_frame size "<<init_frame->points.size()<<std::endl;
+        // pointcloud_cart2sph.get_curr_frame_pointcloud(init_frame, last_pose);
+        // std::cout<<"get_curr_frame_pointcloud "<<std::endl;
+        // // pointcloud_cart2sph.delete_virual_pointcloud();
+        // pointcloud_cart2sph.high_delete_virual_pointcloud();
+        // std::cout<<"delete_virual_pointcloud "<<std::endl;
+        // init_frame->clear();
+        // //初始化结束：全局点云的获取、构造PointCloudCart2Sph类，进行第一帧点云的处理
+        // pic_num++;
+        // for(pic_num;pic_num < transform_list.size();pic_num++){
+        //     std::cout<<"pic_num "<<pic_num<<std::endl;
 
-            auto curr_pose = transform_list[pic_num];auto curr_frame = pointcloud_list_map_[pic_num];
+        //     auto curr_pose = transform_list[pic_num];auto curr_frame = pointcloud_list_map_[pic_num];
 
-            auto start = std::chrono::high_resolution_clock::now();
+        //     auto start = std::chrono::high_resolution_clock::now();
 
-            // auto relative_pose = curr_pose*last_pose.inverse();
-            // pointcloud_cart2sph.update_pointcloud(relative_pose);
-            pointcloud_cart2sph.update_pointcloud2(curr_pose);
-            auto end0 = std::chrono::high_resolution_clock::now();
-            auto duration0 = std::chrono::duration_cast<std::chrono::milliseconds> (end0 - start);
+        //     // auto relative_pose = curr_pose*last_pose.inverse();
+        //     // pointcloud_cart2sph.update_pointcloud(relative_pose);
+        //     pointcloud_cart2sph.update_pointcloud2(curr_pose);
+        //     auto end0 = std::chrono::high_resolution_clock::now();
+        //     auto duration0 = std::chrono::duration_cast<std::chrono::milliseconds> (end0 - start);
 
-            pointcloud_cart2sph.get_curr_frame_pointcloud(curr_frame, curr_pose);
-            auto end1 = std::chrono::high_resolution_clock::now();
-            auto duration1 = std::chrono::duration_cast<std::chrono::milliseconds> (end1 - end0);
+        //     pointcloud_cart2sph.get_curr_frame_pointcloud(curr_frame, curr_pose);
+        //     auto end1 = std::chrono::high_resolution_clock::now();
+        //     auto duration1 = std::chrono::duration_cast<std::chrono::milliseconds> (end1 - end0);
 
-            // pointcloud_cart2sph.delete_virual_pointcloud();
-            pointcloud_cart2sph.high_delete_virual_pointcloud();
-            auto end2 = std::chrono::high_resolution_clock::now();
-            auto duration2 = std::chrono::duration_cast<std::chrono::milliseconds> (end2 - end1);
-            last_pose = curr_pose;
+        //     // pointcloud_cart2sph.delete_virual_pointcloud();
+        //     pointcloud_cart2sph.high_delete_virual_pointcloud();
+        //     auto end2 = std::chrono::high_resolution_clock::now();
+        //     auto duration2 = std::chrono::duration_cast<std::chrono::milliseconds> (end2 - end1);
+        //     last_pose = curr_pose;
 
-            std::cout<<"update_pointcloud spend time "<<duration0.count()<<" ms"<<std::endl;
-            std::cout<<"get_curr_frame_pointcloud spend time "<<duration1.count()<<" ms"<<std::endl;
-            std::cout<<"delete_virual_pointcloud spend time "<<duration2.count()<<" ms"<<std::endl;
-            if(pic_num == 10) break;
-        }
-        auto filter_point = pointcloud_cart2sph.get_result_pointcloud();
-        std::string path_save ="/home/mt_eb1/LYX/filter_noise_point/Table/";
-        pcl::transformPointCloud(*filter_point[1], *filter_point[1], last_pose.inverse());
-        pcl::io::savePLYFile(path_save+"ori.ply", *filter_point[1]);
-        cloud->clear();
-        pcl::transformPointCloud(*filter_point[0], *filter_point[0], last_pose.inverse());
-        pcl::io::savePLYFile(path_save+"filter_point.ply", *filter_point[0]);
+        //     std::cout<<"update_pointcloud spend time "<<duration0.count()<<" ms"<<std::endl;
+        //     std::cout<<"get_curr_frame_pointcloud spend time "<<duration1.count()<<" ms"<<std::endl;
+        //     std::cout<<"delete_virual_pointcloud spend time "<<duration2.count()<<" ms"<<std::endl;
+        //     if(pic_num == 10) break;
+        // }
+        // auto filter_point = pointcloud_cart2sph.get_result_pointcloud();
+        // std::string path_save ="/home/mt_eb1/LYX/filter_noise_point/Table/";
+        // pcl::transformPointCloud(*filter_point[1], *filter_point[1], last_pose.inverse());
+        // pcl::io::savePLYFile(path_save+"ori.ply", *filter_point[1]);
+        // cloud->clear();
+        // pcl::transformPointCloud(*filter_point[0], *filter_point[0], last_pose.inverse());
+        // pcl::io::savePLYFile(path_save+"filter_point.ply", *filter_point[0]);
         return -1;
         // pcl::io::savePLYFileASCII((base_dir / "tf_ori.ply").string(), *cloud);
         // return -1;
