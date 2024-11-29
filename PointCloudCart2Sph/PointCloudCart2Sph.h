@@ -100,7 +100,7 @@ class PointCloudCart2Sph{
 
     private:
         std::vector<pcl::PointCloud<PointT>::Ptr> ori_pointcloud_list;
-        std::vector<std::vector<std::atomic<int>>> ori_pointcloudIndex_pointIndex_status;
+        std::vector<std::vector<int>> ori_pointcloudIndex_pointIndex_status;
         std::vector<Eigen::Matrix4f> pose_matrix;
         Eigen::Matrix4f recover_pose;
         float theta_resolution;
