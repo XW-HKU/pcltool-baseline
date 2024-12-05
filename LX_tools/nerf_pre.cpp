@@ -27,8 +27,9 @@ std::vector<std::string> splitString(const std::string& str, char delimiter) {
 
   return tokens;
 }
-
-
+void NERF_PRE::save_frame_ply(pcl::PointCloud<pcl::PointXYZRGBL>::Ptr cloud ,std::string save_path){
+    pcl::io::savePLYFileBinary(save_path, *cloud);
+}
 std::vector<pcl::PointCloud<pcl::PointXYZRGBL>::Ptr> NERF_PRE::run(std::string lx_file_name, float downsample_size, std::vector<Eigen::Matrix4d> &pose_list)
 {
     std::unordered_map<int, pcl::PointCloud<pcl::PointXYZRGBL>::Ptr> temp;
@@ -43,13 +44,16 @@ std::vector<pcl::PointCloud<pcl::PointXYZRGBL>::Ptr> NERF_PRE::run(std::string l
     float voxelSize = 0.05f;
     float voxelSizeHalf = voxelSize / 2.0f;
     // get dir name using std's std::string
-
+    std::filesystem::path lx_path(lx_file_name);
     lx_file_name_ = lx_file_name; // "/home/xw/XW/Bags/Panora/2023-08-22-10-41-46/MANIFOLD_2023-08-22-10-41-46.lx";
     auto split_lx_file_name = splitString(lx_file_name_, '/');
 
     auto lx_name = split_lx_file_name[split_lx_file_name.size() - 1];
     lx_name = splitString(lx_name, '.')[0]+".ply";
-    auto save_path = "/home/mt_eb1/LYX/filter_noise_point/Table/" + lx_name;
+    auto file_name = split_lx_file_name[split_lx_file_name.size() - 2];
+    // auto save_path = "/home/mt_eb1/LYX/filter_noise_point/Table/" + lx_name;
+    std::string base_path = lx_path.parent_path();//"/home/mt_eb1/LYX/DataFromServe/HongKongData/MT20241129-120449";///home/mt_eb1/LYX/filter_noise_point/Table
+    auto save_path = base_path+"/"+lx_name;//auto save_path = base_path+file+"/"+lx_name;
     std::cout<<"save path "<<save_path<<std::endl;
     // std::string lx_file_name_ = "/home/xw/XW/Bags/Panora/Panora_0414_stjohn_raw/RawData/2023-04-15-04-48-2floor3room/MANIFOLD_2023-04-15-04-48-3ro.lx";
     // std::string lx_file_name_ = "/home/xw/XW/Bags/Panora/2023-06-16-11-42-07/MANIFOLD_2023-06-16-11-42-07.lx";
@@ -79,13 +83,29 @@ std::vector<pcl::PointCloud<pcl::PointXYZRGBL>::Ptr> NERF_PRE::run(std::string l
         if (pclPointsVec[i].label < cam_pose.size())
             cloud->points.push_back(pclPointsVec[i]);
     }
-    pcl::io::savePLYFileBinary("/home/mt_eb1/LYX/filter_noise_point/Table/No_Smooth_"+lx_name, *cloud);
-
-    if(pcl::io::loadPLYFile(save_path, *cloud) != -1)
+    // pcl::io::savePLYFileBinary("/home/mt_eb1/LYX/DataFromServe/HongKongData/MT20241129-100544"+lx_name, *cloud);
+    // pcl::io::savePLYFileBinary("/home/mt_eb1/LYX/DataFromServe/HongKongData/"+file_name+"/no_smooth"+lx_name, *cloud);
+    if(pcl::io::loadPLYFile(save_path, *cloud) == -1)
     {
         ;
     }else{
         std::unordered_map<int, pcl::PointCloud<pcl::PointXYZRGBL>::Ptr> map;
+        pcl::StatisticalOutlierRemoval<PointT> sor;
+        auto save_filter_path = "/home/mt_eb1/LYX/filter_noise_point/Table/out/setStddevMulThresh"+lx_name;
+        if(!(std::filesystem::exists(save_filter_path))){
+            auto t0 = std::chrono::high_resolution_clock::now();
+            sor.setInputCloud (cloud);
+            sor.setMeanK (10); //  考虑的临近点数
+            sor.setStddevMulThresh (0.5); //  标准差倍数阈值
+            pcl::PointCloud<PointT>::Ptr cloud_filtered (new pcl::PointCloud<PointT>);
+            sor.filter (*cloud_filtered);
+            auto t1 = std::chrono::high_resolution_clock::now();
+            std::cout<<"StatisticalOutlierRemoval filter spend time "<<std::chrono::duration_cast<std::chrono::milliseconds> (t1 - t0).count()<<" ms"<<std::endl;
+            pcl::io::savePLYFileBinary("/home/mt_eb1/LYX/filter_noise_point/Table/out/setStddevMulThresh"+lx_name, *cloud_filtered);
+        }
+
+
+
         for(auto const &point : cloud->points)
         {
             int label = point.label;
@@ -113,6 +133,12 @@ std::vector<pcl::PointCloud<pcl::PointXYZRGBL>::Ptr> NERF_PRE::run(std::string l
         }
         pose_list = pose_for_unordered_map;
         std::cout<<"read lx done"<<std::endl;
+        // for(int frame_num = 0;frame_num < pointcloud_list.size();frame_num++){
+        //     auto cloud = pointcloud_list[frame_num];
+        //     std::string save_path = "/home/mt_eb1/LYX/DataFromServe/HongKongData/MT20241129-100544/frame/"+std::to_string(frame_num)+".ply";
+        //     save_frame_ply(cloud, save_path);
+        // }
+        std::cout<<"save fram.ply done"<<std::endl;
         return pointcloud_list;      
     }
 

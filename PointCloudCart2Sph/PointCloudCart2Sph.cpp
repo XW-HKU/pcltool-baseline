@@ -1,5 +1,11 @@
 #include "PointCloudCart2Sph.h"
 #include <pcl/features/normal_3d.h> //For computeCovarianceMatrix
+#include <filesystem> 
+#include <Eigen/Dense>
+#include <Eigen/Eigenvalues>
+#include <pcl/common/pca.h>
+
+namespace fs = std::filesystem;
 
 float PointCloudCart2Sph::get_point_in_sph_theta(const PointT& point){
     const float& x = point.x;
@@ -14,7 +20,6 @@ float PointCloudCart2Sph::get_point_in_sph_phi(const PointT& point){
     const float& z = point.z;
     float r = sqrt(x*x + y*y + z*z);
     float phi = acos(z/r);
-    float phi_theta = phi/M_PI*180;
     // if(phi < 0 )
 
     return phi;
@@ -24,7 +29,7 @@ float PointCloudCart2Sph::get_point_in_sph_r(const PointT& point){
     return sqrt(point.x*point.x + point.y*point.y + point.z*point.z);
 }
 
-std::vector<PointCloudCart2Sph::Sphgrid> PointCloudCart2Sph:: curr_frame_pointcloud_sphgrid (pcl::PointCloud<PointT>::Ptr& curr_frame){
+std::vector<PointCloudCart2Sph::Sphgrid> PointCloudCart2Sph:: curr_frame_pointcloud_sphgrid (pcl::PointCloud<PointT>::Ptr& curr_frame, int i,float& max_deep){
     std::vector<PointCloudCart2Sph::Sphgrid> CurrFramePointcloudSphgrid;
     int temp = 0;
     auto t0 = std::chrono::high_resolution_clock::now();
@@ -35,7 +40,13 @@ std::vector<PointCloudCart2Sph::Sphgrid> PointCloudCart2Sph:: curr_frame_pointcl
         
     }
     auto t1 = std::chrono::high_resolution_clock::now();
+    int point_index = 0;
     for(auto & point : curr_frame->points){
+
+        // if(ori_pointcloudIndex_pointIndex_status[i][point_index]>2){
+        //     continue;
+        // }  
+
         float theta = get_point_in_sph_theta(point);
         float phi = get_point_in_sph_phi(point);
         int index = index_in_vector_of_sphgrid(theta, phi);
@@ -49,12 +60,15 @@ std::vector<PointCloudCart2Sph::Sphgrid> PointCloudCart2Sph:: curr_frame_pointcl
         }
         if(CurrFramePointcloudSphgrid[index].min_depth > depth){
             CurrFramePointcloudSphgrid[index].min_depth = depth;
+            CurrFramePointcloudSphgrid[index].x = point.x;
+            CurrFramePointcloudSphgrid[index].y = point.y;
+            CurrFramePointcloudSphgrid[index].z = point.z;
         }
         CurrFramePointcloudSphgrid[index].bar_depth += depth;
         //test
-        CurrFramePointcloudSphgrid[index].x += point.x;
-        CurrFramePointcloudSphgrid[index].y += point.y;
-        CurrFramePointcloudSphgrid[index].z += point.z;
+        // CurrFramePointcloudSphgrid[index].x += point.x;
+        // CurrFramePointcloudSphgrid[index].y += point.y;
+        // CurrFramePointcloudSphgrid[index].z += point.z;
         //test
         CurrFramePointcloudSphgrid[index].size += 1;
         // if(CurrFramePointcloudSphgrid[index].occupied == false){
@@ -62,397 +76,316 @@ std::vector<PointCloudCart2Sph::Sphgrid> PointCloudCart2Sph:: curr_frame_pointcl
         // }
     }
     auto t2 = std::chrono::high_resolution_clock::now();
-
+    
     for(auto & grid : CurrFramePointcloudSphgrid){
         if(grid.occupied == false) continue;
+        if(grid.max_depth >max_deep){
+            max_deep = grid.max_depth;
+        }
         grid.bar_depth = grid.bar_depth/grid.size;
-
+        grid.mindepth_point.x = grid.x;grid.mindepth_point.y=grid.y;grid.mindepth_point.z=grid.z;
         //test
-        grid.x = grid.x/grid.size;
-        grid.y = grid.y/grid.size;
-        grid.z = grid.z/grid.size;
+        // grid.x = grid.x/grid.size;
+        // grid.y = grid.y/grid.size;
+        // grid.z = grid.z/grid.size;
         //test
 
         // std::cout<<"grid.depth "<<grid.depth<<std::endl;
     }
 
     auto t3 = std::chrono::high_resolution_clock::now();
-    std::cout<<"init CurrFramePointcloudSphgrid spend time "<<std::chrono::duration_cast<std::chrono::milliseconds> (t1 - t0).count()<<" ms"<<std::endl;
-    std::cout<<"fill CurrFramePointcloudSphgrid spend time "<<std::chrono::duration_cast<std::chrono::milliseconds> (t2 - t1).count()<<" ms"<<std::endl;
+    // std::cout<<"init CurrFramePointcloudSphgrid spend time "<<std::chrono::duration_cast<std::chrono::milliseconds> (t1 - t0).count()<<" ms"<<std::endl;
+    // std::cout<<"fill CurrFramePointcloudSphgrid spend time "<<std::chrono::duration_cast<std::chrono::milliseconds> (t2 - t1).count()<<" ms"<<std::endl;
     // std::cout<<"compute CurrFramePointcloudSphgrid depth spend time "<<std::chrono::duration_cast<std::chrono::milliseconds> (t3 - t2).count()<<" ms"<<std::endl;
     return CurrFramePointcloudSphgrid;    
 
 }
-
+  auto reduction = [](int x, int y) {
+    return x + y;
+  };
 void PointCloudCart2Sph::delete_virual_pointcloud(){
-
-    Eigen::Matrix4f last_pose = Eigen::Matrix4f::Identity();
-    int stop_index = 210;
-    for(int pose_index = 0 ; pose_index < ori_pointcloud_list.size();pose_index++){
-        auto t0 = std::chrono::high_resolution_clock::now();
-        std::cout<<"pose_index "<<pose_index<<std::endl;
-        // int stop_index = 50;
-        Eigen::Matrix4f& curr_pose = pose_matrix[pose_index];
-        Eigen::Matrix4f relative_pose = curr_pose.inverse()*last_pose;
-        last_pose = curr_pose;recover_pose = curr_pose;
-        for(auto& pointcloud_ptr : ori_pointcloud_list){
-            pcl::transformPointCloud(*pointcloud_ptr, *pointcloud_ptr, relative_pose);
-        }
-        //test
-        PointT my_point;PointT bar_point;pcl::PointCloud<PointT>::Ptr my_point_occupied_map_sph(new pcl::PointCloud<PointT>);
-        pcl::PointCloud<PointT>::Ptr my_point_filter_map_sph(new pcl::PointCloud<PointT>);
-        pcl::PointCloud<PointT>::Ptr my_point_curr_frame_in_same_map_sph(new pcl::PointCloud<PointT>);
-        // my_point.x = 0.517215;消防柜边边
-        // my_point.y = -0.671407;
-        // my_point.z = 0.024059;
-        // my_point.x = 0.317446;消防柜
-        // my_point.y = -0.839254;
-        // my_point.z = 0.039464;
-        // my_point.b = 255;
-        // my_point.x = 0.213499;//消防柜
-        // my_point.y = -0.810174;
-        // my_point.z = 0.013973;
-        // my_point.b = 255;
-        // my_point.x = -0.195496;//水管
-        // my_point.y = -1.048251;
-        // my_point.z = 0.395797;
-        // my_point.b = 255;
-
-        // my_point.x = -0.718042;//电梯侧面
-        // my_point.y = 1.673669;
-        // my_point.z = 0.012777;
-        // my_point.b = 255;
-
-        // my_point.x = -0.624646;//电梯顶部
-        // my_point.y = 2.345728;
-        // my_point.z = 0.591637;
-        // my_point.b = 255;       
-
-        // my_point.x = -0.927345;//直角墙壁
-        // my_point.y = 0.053948;
-        // my_point.z = 0.690682;
-        // my_point.b = 255; 
-
-        // my_point.x = 1.307393;//电梯侧顶部
-        // my_point.y = 2.018894;
-        // my_point.z = 0.786813;
-        // my_point.b = 255; 
-
-        // my_point.x = 1.075589;//门的一侧
-        // my_point.y = -0.611792;
-        // my_point.z = 0.064304;
-        // my_point.b = 255; 
-
-        // my_point.x = 1.881700;//门的左顶侧
-        // my_point.y = -0.310064;
-        // my_point.z = 0.442763;
-        // my_point.b = 255; 
-
-        // my_point.x = -3.091873;//天花板点
-        // my_point.y = 0.334648;
-        // my_point.z = 0.513744;
-        // my_point.b = 255; 
-
-        // my_point.x = -0.774121;//电梯平滑的奇怪点
-        // my_point.y = 1.748739;
-        // my_point.z = 0.202999;
-        // my_point.b = 255; 
-
-        // 11.28 房间的新数据 第200帧
-        // my_point.x = -1.850120;
-        // my_point.y = -0.583996;
-        // my_point.z =  1.145391;
-        // my_point.b = 255; 
-
-        // my_point.x = 3.035350;// // 11.28 房间的新数据 第200帧 电梯表面
-        // my_point.y = 1.210225;
-        // my_point.z = 2.317321;
-        // my_point.b = 255; 
-
-        // my_point.x = 3.025894;// // 11.28 房间的新数据 第200帧 墙侧
-        // my_point.y = 1.221539;
-        // my_point.z =  2.448452;
-        // my_point.b = 255; 
-
-        // my_point.x = 2.254071;// // 11.28 房间的新数据 第200帧 拉丝点
-        // my_point.y = -0.630593;
-        // my_point.z =  2.700840;
-        // my_point.b = 255; 
-
-        my_point.x = -0.753579;// // 11.28 房间的新数据 电梯侧面的误杀
-        my_point.y = -0.575765;
-        my_point.z =  2.101778;
-        my_point.b = 255; 
-
-        my_point.x = -0.827977;// // 11.28 房间的新数据 电梯侧面的误杀
-        my_point.y = -0.578418;
-        my_point.z =  1.942765;
-        my_point.b = 255; 
-        //因为在世界坐标系下
-        bool save_once = false;
-        Eigen::Matrix<float, 4, 1> my_point_eigen(my_point.x, my_point.y, my_point.z, 1);
-        my_point_eigen = relative_pose*my_point_eigen;
-        my_point.x = my_point_eigen(0);my_point.y = my_point_eigen(1);my_point.z = my_point_eigen(2);
-        //乘以相对位姿转到当前帧坐标系下
-
-        PointT ori_point;ori_point.x = 0;ori_point.y = 0;ori_point.z = 0;ori_point.g = 255;
-        float my_point_theta = get_point_in_sph_theta(my_point);
-        float my_point_phi = get_point_in_sph_phi(my_point);
-        int my_point_index = index_in_vector_of_sphgrid(my_point_theta, my_point_phi);
-        std::cout<<"my_point_index init "<<my_point.x<<" "<<my_point.y<<" "<<my_point.z<<" "<<my_point_index<<std::endl;
-        auto curr_pointcloud_sphgrid = curr_frame_pointcloud_sphgrid(ori_pointcloud_list[pose_index]);
-        auto t1 = std::chrono::high_resolution_clock::now();
-        // //test
-        // bool obversed_pixel = false;pcl::PointCloud<PointT>::Ptr point_in_pixel(new pcl::PointCloud<PointT>);
-        // //test
+    // Eigen::Matrix4f last_pose = Eigen::Matrix4f::Identity();
+    // int stop_index = 89;
+    std :: mutex mtx;
+    // std :: mutex save_lock;
+    // std:: mutex count_lock;
+    // PointT testpoint;testpoint.x = 1.414068;testpoint.y = 0.288488;testpoint.z = 0.182881;
+    // int TestPointSphIndex = get_testpoint_sphindex(testpoint, stop_index);
+    tbb::parallel_for(tbb::blocked_range<size_t>(0, ori_pointcloud_list.size()),
+    [&] (tbb::blocked_range<size_t> r)
+    {
         
-        // //test
-        // for(auto& point : *ori_pointcloud_list[pose_index]){
-        //     int point_index = index_in_vector_of_sphgrid(get_point_in_sph_theta(point), get_point_in_sph_phi(point));
+        std::vector<std::pair<int, int>> filter_idnex;
+
+        for(size_t i = r.begin(); i != r.end(); i++){
+            // if(r.begin() != stop_index ) break;
+
+            SphTools sph_tools;
+
+            auto t0 = std::chrono::high_resolution_clock::now();
+
             
-        //     if(point_index == my_point_index) {
-        //         auto temp = point;
-        //         temp.r=0;
-        //         temp.g=255;
-        //         temp.b=0;
-        //         my_point_curr_frame_in_same_map_sph->points.push_back(temp);
-        //     }
-        // }
-        // if(abs(curr_pointcloud_sphgrid[my_point_index].x) > 0.0001 && abs(curr_pointcloud_sphgrid[my_point_index].y) > 0.0001 && abs(curr_pointcloud_sphgrid[my_point_index].z) > 0.0001){
-        //     my_point.x = curr_pointcloud_sphgrid[my_point_index].x; my_point.y = curr_pointcloud_sphgrid[my_point_index].y; my_point.z = curr_pointcloud_sphgrid[my_point_index].z;
-        // }else{
-        //     my_point.r=0;my_point.g=0;my_point.b=255;//若当前帧有点坐落于该区域则为当前帧的均值点，否则为选定的点
-        // }
-        // my_point_curr_frame_in_same_map_sph->push_back(my_point);
-        // //test
+
+            Eigen::Matrix4f curr_pose = pose_matrix[i];//获取当前帧的位姿
+            local_pose.x = curr_pose(0,3);local_pose.y = curr_pose(1,3);local_pose.z = curr_pose(2,3);//记录局部位姿
+            std::vector<pcl::PointCloud<PointT>::Ptr> ori_pointcloud_list_;//用于储存ori_pointcloud_list的变换后的点云
+
+            for(auto pointcloud_ptr : ori_pointcloud_list){//将原始点云全部变换到局部坐标系下
+                
+                pcl::PointCloud<PointT>::Ptr temp_pointcloud(new pcl::PointCloud<PointT>);
+                pcl::transformPointCloud(*pointcloud_ptr, *temp_pointcloud, curr_pose.inverse());
+                // *transafter_pointcloud += *temp_pointcloud;
+                ori_pointcloud_list_.emplace_back(temp_pointcloud);
+            }
 
 
-        //test
+            //记录用于位姿变换的位姿
+            Eigen::Matrix4f relative_pose = curr_pose.inverse();
 
-        // std::cout<<" curr_pointcloud_sphgrid "<<curr_pointcloud_sphgrid.size()<<std::endl;
-        // curr_pointcloud_sphgrid[my_point_index].depth =sqrt(my_point.x*my_point.x + my_point.y*my_point.y + my_point.z*my_point.z);
-        auto t2 = std::chrono::high_resolution_clock::now();
-        //test
+            bool do_once = false;//用于只记录当前的点临近栅格并保存点云一次，只针对单帧情况
 
-        //test
-        // for(int pointcloud_of_map_ptr_index = 0 ; pointcloud_of_map_ptr_index < ori_pointcloud_list.size();pointcloud_of_map_ptr_index++){
-        //     if(pointcloud_of_map_ptr_index == pose_index) continue;
-        //     for(int point_index = 0 ;point_index < ori_pointcloud_list[pointcloud_of_map_ptr_index]->points.size();point_index++){
-        //         PointT point_in_selected_pointcloud = ori_pointcloud_list[pointcloud_of_map_ptr_index]->points[point_index];
+            float curr_frame_max_deep = 0;
 
-        //         float theta = get_point_in_sph_theta(point_in_selected_pointcloud);
-        //         float phi = get_point_in_sph_phi(point_in_selected_pointcloud);
-        //         int index = index_in_vector_of_sphgrid(theta, phi);
-        //         if(index == my_point_index) my_point_occupied_map_sph->points.push_back(point_in_selected_pointcloud);                
-        //     }
-        // }
-        // //test
+            auto curr_pointcloud_sphgrid = curr_frame_pointcloud_sphgrid(ori_pointcloud_list_[i],i,curr_frame_max_deep);//获取当前帧的球坐标系下的栅格点云以及最大深度
+
+            std::cout<<"curr_frame_max_deep "<<curr_frame_max_deep<<std::endl;
+
+            // 从 curr_pointcloud_sphgrid 中构建cv::mat
+            // cv::Mat depth_image = cv::Mat::zeros(phi_size, theta_size, CV_32FC1);
+            // for (int i = 0; i < phi_size; i++){
+            //     for (int j = 0; j < theta_size; j++){
+            //         int index = i*theta_size + j;
+            //         if(curr_pointcloud_sphgrid[index].occupied == false) continue;
+            //         depth_image.at<float>(i, j) = curr_pointcloud_sphgrid[index].bar_depth;
+            //     }
+            // }
+            // 将depth_image存储为/home/mt_eb1/LYX/filter_noise_point/Table/depth.png
+            // cv::Mat depth_image_show;
+            // cv::normalize(depth_image, depth_image_show, 0, 255, cv::NORM_MINMAX);
+            // // inverse the color
+            // cv::Mat depth_image_show_inv = cv::Mat::zeros(phi_size, theta_size, CV_32FC1);
+            // std::cout<<"min_phi "<<min_phi<<" max_phi "<<max_phi<<std::endl;    
+            // for (int i = 0; i < phi_size; i++){
+            //     if(i >= min_phi && i <=max_phi)
+            //     for (int j = 0; j < theta_size; j++){
+            //         depth_image_show_inv.at<float>(i, j) = 255 - depth_image_show.at<float>(i, j);
+            //     }
+            //     else{
+            //         for (int j = 0; j < theta_size; j++){
+            //             depth_image_show_inv.at<float>(i, j) = depth_image_show.at<float>(i, j);
+            //         }
+            //     }
+            // }
+
+            // std::string temp_save_i = std::to_string(i);
+            
+            // //若能找到"/home/mt_eb1/LYX/DataFromServe/HongKongData/MT20241129-100544/curr_frame_depth/"+temp_save_i+".png"路径下的文件，则不保存
+            
+            // if(fs::exists(img_save_path+img_save_file+temp_save_i+".png")){
+
+            // }else{
+            //     cv::imwrite(img_save_path+img_save_file+temp_save_i+".png", depth_image_show_inv);
+            // }
 
 
-        for(int pointcloud_of_map_ptr_index = 0 ; pointcloud_of_map_ptr_index < ori_pointcloud_list.size();pointcloud_of_map_ptr_index++){
+            auto t2 = std::chrono::high_resolution_clock::now();
 
-            auto t3 = std::chrono::high_resolution_clock::now();
 
-            if(pointcloud_of_map_ptr_index == pose_index) continue;
-            //获取当前map的点云
-            for(int point_index = 0 ;point_index < ori_pointcloud_list[pointcloud_of_map_ptr_index]->points.size();point_index++){
+            //遍历点云
+            for(int pointcloud_of_map_ptr_index = 0 ; pointcloud_of_map_ptr_index < ori_pointcloud_list_.size();pointcloud_of_map_ptr_index++){
 
-                auto t4 = std::chrono::high_resolution_clock::now();
+                auto t3 = std::chrono::high_resolution_clock::now();
 
-                // if(ori_pointcloudIndex_pointIndex_status[pointcloud_of_map_ptr_index][point_index] == 0) continue;
-                const PointT& point_in_selected_pointcloud = ori_pointcloud_list[pointcloud_of_map_ptr_index]->points[point_index];
+                //获取当前map的点云若为当前帧，跳过
+                if(pointcloud_of_map_ptr_index == i){
+                    // for(int point_index = 0 ;point_index < ori_pointcloud_list_[pointcloud_of_map_ptr_index]->points.size();point_index++){
+                    //     const PointT& point_in_selected_pointcloud = ori_pointcloud_list_[pointcloud_of_map_ptr_index]->points[point_index];
+                    //     auto temp = point_in_selected_pointcloud;temp.r = 0;temp .g = 255;temp.b = 0;
+                    //     obvious_point(TestPointSphIndex, temp, stop_index);
+                    // }
 
-                float theta = get_point_in_sph_theta(point_in_selected_pointcloud);
-                float phi = get_point_in_sph_phi(point_in_selected_pointcloud);
-                int index = index_in_vector_of_sphgrid(theta, phi);
-                //////////////////////////////
-                // if(index == my_point_index) my_point_occupied_map_sph->points.push_back(point_in_selected_pointcloud);
-                if(curr_pointcloud_sphgrid[index].occupied == false) continue;
-                PointT curr_frame_pointcloud_sphgrid_bar_point;
-                curr_frame_pointcloud_sphgrid_bar_point.x = curr_pointcloud_sphgrid[index].x;
-                curr_frame_pointcloud_sphgrid_bar_point.y = curr_pointcloud_sphgrid[index].y;
-                curr_frame_pointcloud_sphgrid_bar_point.z = curr_pointcloud_sphgrid[index].z;
-                float depth_curr_frame_pointcloud_sphgrid_bar_point = get_point_in_sph_r(curr_frame_pointcloud_sphgrid_bar_point);
-                // std::cout<<"curr_pointcloud_sphgrid[index].size "<<curr_pointcloud_sphgrid[index].size<<std::endl;  
-                //test
-                // if(curr_pointcloud_sphgrid[index].size < 1) continue;
-                // std::cout<<"curr_pointcloud_sphgrid[index].size "<<curr_pointcloud_sphgrid[index].size<<std::endl;
-                //test
-                float map_point_depth = get_point_in_sph_r(point_in_selected_pointcloud);
-                auto t5 = std::chrono::high_resolution_clock::now();
-                // if((curr_pointcloud_sphgrid[index].depth - map_point_depth)>0 && (curr_pointcloud_sphgrid[index].depth - map_point_depth)<0.03 || (map_point_depth - curr_pointcloud_sphgrid[index].depth)>0 && (map_point_depth - curr_pointcloud_sphgrid[index].depth)<0.03){
-                //     ori_pointcloudIndex_pointIndex_status[pointcloud_of_map_ptr_index][point_index]=0;
-                // }
-                float depth_diff = curr_pointcloud_sphgrid[index].max_depth - curr_pointcloud_sphgrid[index].min_depth;
-                float map_point_depth_diff = map_point_depth - curr_pointcloud_sphgrid[index].min_depth;
-                float map_point_depth_diff_bar = curr_pointcloud_sphgrid[index].bar_depth - map_point_depth;
-                if(map_point_depth_diff < 0 && map_point_depth_diff_bar > 0.05 && map_point_depth_diff_bar < 0.5){
-                    // //test
-                    // if(index == my_point_index){
-                    
-                    // my_point_filter_map_sph->points.push_back(point_in_selected_pointcloud);
-                    // } 
-                    // //test
+                    continue;
+                } 
 
-                    //new funcion
-                    std::vector<int> searched_pixel_index;
-                    // float search_radius = 0.18*(log((0.1*depth_curr_frame_pointcloud_sphgrid_bar_point*depth_curr_frame_pointcloud_sphgrid_bar_point+1/exp(1))*exp(1)));
-                    int search_pixel_range = 9;
+                //获取当前map的点
+                for(int point_index = 0 ;point_index < ori_pointcloud_list_[pointcloud_of_map_ptr_index]->points.size();point_index++){
+
+                    auto t4 = std::chrono::high_resolution_clock::now();
+
+
+
+                    //获取Map中欧的点
+                    const PointT& point_in_selected_pointcloud = ori_pointcloud_list_[pointcloud_of_map_ptr_index]->points[point_index];
+                    // obvious_point(TestPointSphIndex, point_in_selected_pointcloud, stop_index);
+                    float map_point_depth = get_point_in_sph_r(point_in_selected_pointcloud);
+                    //map点的深度大于当前帧最深点的深度，跳过。相当于不在当前帧的视角范围内的点不做处理
+                    if(map_point_depth > curr_frame_max_deep ) continue;
+                    //获取Map点在球坐标系下的theta和phi
+                    float theta = get_point_in_sph_theta(point_in_selected_pointcloud);
+                    float phi = get_point_in_sph_phi(point_in_selected_pointcloud);
+                    int index = index_in_vector_of_sphgrid(theta, phi);
+
+
+
+                    //若球坐标系像素不包含当前帧的点，则跳过
+                    if(curr_pointcloud_sphgrid[index].occupied == false) continue;
+
+                    //获取与Map在同一个像素中的最浅的当前帧点
+                    PointT curr_frame_pointcloud_sphgrid_mindepth_point;
+                    curr_frame_pointcloud_sphgrid_mindepth_point.x = curr_pointcloud_sphgrid[index].x;
+                    curr_frame_pointcloud_sphgrid_mindepth_point.y = curr_pointcloud_sphgrid[index].y;
+                    curr_frame_pointcloud_sphgrid_mindepth_point.z = curr_pointcloud_sphgrid[index].z;
+
+                    //获取当前帧点在球坐标系下的深度，theta，phi
+                    float depth_curr_frame_pointcloud_sphgrid_bar_point = get_point_in_sph_r(curr_frame_pointcloud_sphgrid_mindepth_point);
+                    float curr_frame_pointcloud_sphgrid_bar_point_theta = get_point_in_sph_theta(curr_frame_pointcloud_sphgrid_mindepth_point);
+                    float curr_frame_pointcloud_sphgrid_bar_point_phi = get_point_in_sph_phi(curr_frame_pointcloud_sphgrid_mindepth_point);
+
+                    //获取Map点在球坐标系下的theta和phi的索引
                     int point_in_selected_pointcloud_theta_index = get_point_in_sph_theta_index(point_in_selected_pointcloud);
                     int point_in_selected_pointcloud_phi_index = get_point_in_sph_phi_index(point_in_selected_pointcloud);
-                    for(int i = -search_pixel_range; i < search_pixel_range+1; i++){
-                        for(int j = -search_pixel_range; j < search_pixel_range+1; j++){
-                            int theta_index = point_in_selected_pointcloud_theta_index + i;
-                            int phi_index = point_in_selected_pointcloud_phi_index + j;
-                            
-                            if(theta_index < 0 || theta_index >= theta_size || phi_index < 0 || phi_index >= phi_size) continue;
-                            int pixel_index = phi_index*theta_size + theta_index;
-                            searched_pixel_index.emplace_back(pixel_index);
-                        }
-                    }
-                    // std::cout<<"searched_pixel_index.size() "<<searched_pixel_index.size()<<std::endl;
-                    //new funcion
-                    bool is_delete = true;
-                    int pass_time = 0;
-                    for(auto & pixel_index : searched_pixel_index){
-                        if(curr_pointcloud_sphgrid[pixel_index].occupied == false){
-                            pass_time++;
-                            continue;
-                        }
-                        float depth_ = curr_pointcloud_sphgrid[pixel_index].bar_depth;
-                        if(depth_ < map_point_depth){
-                            is_delete = false;
-                            break;
-                        }
-                    }
-                    if(pass_time == searched_pixel_index.size()) is_delete = false;
-                    if(is_delete){
-                        ori_pointcloudIndex_pointIndex_status[pointcloud_of_map_ptr_index][point_index]+=1;
-                        if(my_point_index == index){
-                            my_point_filter_map_sph->points.push_back(point_in_selected_pointcloud);
-                        }
-                    }
+                    //若Map点超过当前帧的视角范围，则跳过
+                    if( (point_in_selected_pointcloud_phi_index >= max_phi) || (point_in_selected_pointcloud_phi_index <= min_phi) )continue;
 
-                    // if(my_point_index == index && obversed_pixel == false){
-                    //     std::cout<<"obversed_pixel my_point_index "<<my_point_index<<std::endl;
-                    //     obversed_pixel = true;
-                    //     std::cout<<"search_pixel_range "<<search_pixel_range<<std::endl; 
-                    //     for(auto & pixel_index : searched_pixel_index){
-                    //         if(curr_pointcloud_sphgrid[pixel_index].occupied == false) continue;
-                    //         std::cout<<"pixel_index "<<pixel_index<<std::endl;
-                    //         PointT temp;
-                    //         temp.x = curr_pointcloud_sphgrid[pixel_index].x;
-                    //         temp.y = curr_pointcloud_sphgrid[pixel_index].y;
-                    //         temp.z = curr_pointcloud_sphgrid[pixel_index].z;
-                    //         Eigen::Matrix<float, 4, 1> temp_point_Eigen(temp.x, temp.y, temp.z, 1);
-                    //         auto temp_point = recover_pose*temp_point_Eigen;
-                    //         std::cout<<"temp.x "<<temp_point[0]<<" temp.y "<<temp_point[1]<<" temp.z "<<temp_point[2]<<" curr_pointcloud_sphgrid[pixel_index] "<<curr_pointcloud_sphgrid[pixel_index].bar_depth<<std::endl;
-                    //         point_in_pixel->points.push_back(temp);
-                    //     }
-                    //     // PointT temp;
-                    //     // temp.x = my_point.x;
-                    //     // temp.y = my_point.y;
-                    //     // temp.z = my_point.z;
-                    //     // point_in_pixel->points.push_back(temp);
-                    //     pcl::transformPointCloud(*point_in_pixel, *point_in_pixel, recover_pose);
-                    //     pcl::io::savePLYFileASCII("/home/mt_eb1/LYX/filter_noise_point/Table/my_point/point_in_pixel.ply", *point_in_pixel);                   
-                    // }
+
+
+                    auto t5 = std::chrono::high_resolution_clock::now();
+
+                    //map点要浅于当前帧最浅点的深度时，被认定为可能的拉丝点
+                    if( map_point_depth < (curr_pointcloud_sphgrid[index].min_depth -0.1))//若curr_pointcloud_sphgrid[index].occupied == false, 则该min_depth为999999(初始值)
+                    {
+
+                        std::vector<int> searched_pixel_index;//临近像素的下标
+                        
+                        //获取临近像素
+                        int search_pixel_range = 1;//像素范围
+                        for(int i = -search_pixel_range; i <= search_pixel_range; i++){
+                            for(int j = -search_pixel_range; j <= search_pixel_range; j++){
+                                int theta_index = point_in_selected_pointcloud_theta_index + j;
+                                int phi_index = point_in_selected_pointcloud_phi_index + i;
+                                
+                                if(theta_index < 0 || theta_index >= theta_size || phi_index < min_phi || phi_index >= max_phi) continue;//与下面的if保持一致，所有像素都在非视角边缘内
+                                searched_pixel_index.emplace_back(phi_index*theta_size + theta_index);
+      
+                            }
+                        }
+
+                        bool point_in_range = false;
+
+
+                        
+                        
+                        bool is_delete = true;//最为关键的变量，判断该点是否应该删除
+                        int pass_time = 0;//记录临近像素中没有被占用的像素的数量
+                        // int size_small = 0;//记录临近像素中point_nums小于2的像素的数量
+
+                        if(searched_pixel_index.empty()) continue;//若临近像素为空，则跳过
+
+
+
+                        for(auto & pixel_index : searched_pixel_index){
+                            if(curr_pointcloud_sphgrid[pixel_index].occupied == false){
+                                pass_time++;//计数 非占据体素
+                                continue;
+                            }
+                            // if(curr_pointcloud_sphgrid[pixel_index].size < 2){
+                            //     size_small++;//计数 临近体素中点数小于2的体素
+                            // }
+                            float sphgrid_depth = curr_pointcloud_sphgrid[pixel_index].min_depth;//取当前curr_pointcloud_sphgrid中最浅点的深度
+                            // float diff_angle = sph_tools.ComputeAngle(point_in_selected_pointcloud, curr_pointcloud_sphgrid[pixel_index].mindepth_point);//计算map点和像素中最浅点的角度差
+                            // diff_angle = diff_angle*180/M_PI;
+
+                            if( map_point_depth  > (sphgrid_depth-0.1)){//map_point_depth(中心体素深度) 若有一个像素浅于中心体素，则不删除
+                                // pass_time++;
+
+                                is_delete = false;
+
+                                break;
+                            }
+                            else{
+                                float diff_angle = sph_tools.ComputeAngle(point_in_selected_pointcloud, curr_pointcloud_sphgrid[pixel_index].mindepth_point);//计算map点和像素中最浅点的角度差
+                                diff_angle = diff_angle*180/M_PI;  
+                                if(diff_angle < 0.3){
+                                    is_delete = true;
+                                }else{
+                                    is_delete = false;                                
+                                    }          
+                            }
+
+                            
+
+
+
+                        }
+
+
+                        if(pass_time == searched_pixel_index.size()) is_delete = false; //若临近像素中都没有当前帧的点，则不删除
+
+                        
+                        //若该点应该删除，则将其filter次数加1
+                        if(is_delete){
+                            // filter_idnex.emplace_back(std::make_pair(pointcloud_of_map_ptr_index, point_index));
+                            mtx.lock();
+                            ori_pointcloudIndex_pointIndex_status[pointcloud_of_map_ptr_index][point_index]++;
+                            mtx.unlock();
+                            //test
+                            // if(my_point_index == index){
+                            //     my_point_filter_map_sph->points.push_back(point_in_selected_pointcloud);
+                            // }
+                            // //test
+                        }
+
+
+
+                    }
 
 
                 }
-                //恢复sphgrid_index_of_MapPoint_AND_MapPoint_coord中非最近的点
-
+                auto t5 = std::chrono::high_resolution_clock::now();
             }
-            auto t5 = std::chrono::high_resolution_clock::now();
+
+
+            auto t6 = std::chrono::high_resolution_clock::now();
+            std::string p_n = std::to_string(i);
+
+
+
+            std::cout<<"begin  "<<i<<" end "<<i<<" spend time "<<std::chrono::duration_cast<std::chrono::milliseconds> (t6 - t2).count()<<" ms"<<std::endl;
+            // if((i+1) % 10 == 0){
+            //     save_pointcloud();
+            // }
+            // count_lock.lock();
+            // process_num++;
+            // count_lock.unlock();
+
+            // if((process_num+1)%10 == 0){
+            //     std::cout<<"save "<<std::endl;
+            //     save_pointcloud();
+            // }
         }
-        auto t6 = std::chrono::high_resolution_clock::now();
-        
-        std::cout<<"transformMap spend time "<<std::chrono::duration_cast<std::chrono::milliseconds> (t1 - t0).count()<<" ms"<<std::endl;
-        std::cout<<"get curr_frame_pointcloud_sphgrid spend time "<<std::chrono::duration_cast<std::chrono::milliseconds> (t2 - t1).count()<<" ms"<<std::endl;
-        std::cout<<"Map is deleted virul points by one pointcloud spend time "<<std::chrono::duration_cast<std::chrono::milliseconds> (t6 - t2).count()<<" ms"<<std::endl;
-        // if(pose_index == stop_index){
-        //     break;
+
+        // mtx.lock();
+        // for(auto & index : filter_idnex){
+        //     // ori_pointcloudIndex_pointIndex_status[index.first][index.second]++;
+        //     *ori_pointcloudIndex_pointIndex_status_automic[index.first][index.second]++;
         // }
+        // mtx.unlock();
 
-
-        //test
-        // if(pose_index == stop_index){
-        //     pcl::PointCloud<PointT>::Ptr temp(new pcl::PointCloud<PointT>);
-        //     pcl::transformPointCloud(*my_point_curr_frame_in_same_map_sph, *temp, recover_pose);
-        //     pcl::io::savePLYFileASCII("/home/mt_eb1/LYX/filter_noise_point/Table/my_point_curr_frame_in_same_map_sph_noRayPath.ply", *temp);
-        //     temp->clear();
-        //     pcl::transformPointCloud(*ori_pointcloud_list[pose_index], *temp, Eigen::Matrix4f::Identity());
-        //     pcl::PointCloud<PointT>::Ptr pose_point(new pcl::PointCloud<PointT>);
-        //     PointT poseposepoint;
-        //     poseposepoint.x = recover_pose(0,3);
-        //     poseposepoint.y = recover_pose(1,3);
-        //     poseposepoint.z = recover_pose(2,3);
-        //     poseposepoint.r = 0;
-        //     poseposepoint.g = 255;
-        //     poseposepoint.b = 0;
-        //     pose_point->points.push_back(poseposepoint);
-
-        //     int dPointxNum = 1000;
-        //     float dx = (my_point.x-ori_point.x)/dPointxNum;float dy = (my_point.y-ori_point.y)/dPointxNum;float dz = (my_point.z-ori_point.z)/dPointxNum;
-        //     PointT start_point = ori_point;
-        //     start_point.r =120;start_point.g = 120;start_point.b = 120;
-        //     my_point_curr_frame_in_same_map_sph->push_back(start_point);
-        //     std::cout<<"my_point.x "<<my_point.x<<" my_point.y "<<my_point.y<<" my_point.z "<<my_point.z<<std::endl;
-        //     std::cout<<"ori_point.x "<<ori_point.x<<" ori_point.y "<<ori_point.y<<" ori_point.z "<<ori_point.z<<std::endl;
-        //     for(int i = 0; i < dPointxNum; i++){
-        //         start_point.x += dx;start_point.y += dy;start_point.z += dz;
-        //         auto temp = start_point;
-        //         temp.r = 0;
-        //         temp.g = 0;
-        //         temp.b = 255;
-        //         my_point_curr_frame_in_same_map_sph->points.push_back(temp);
-        //     }
-
-        //     pcl::transformPointCloud(*temp, *temp, recover_pose);
-        //     pcl::io::savePLYFileASCII("/home/mt_eb1/LYX/filter_noise_point/Table/first_frame.ply", *temp);
-        //     pcl::transformPointCloud(*pose_point, *pose_point, recover_pose);
-        //     pcl::io::savePLYFileASCII("/home/mt_eb1/LYX/filter_noise_point/Table/pose_point.ply", *pose_point);
-
-        //     for(auto & point : my_point_occupied_map_sph->points){
-        //         point.r = 255;
-        //         point.g = 255;
-        //         point.b = 255;
-        //     }
-        //     pcl::transformPointCloud(*my_point_occupied_map_sph, *my_point_occupied_map_sph, recover_pose);
-        //     pcl::io::savePLYFileASCII("/home/mt_eb1/LYX/filter_noise_point/Table/my_point/my_point_occupied_map_sph.ply", *my_point_occupied_map_sph);
-
-        //     // my_point_filter_map_sph->push_back(my_point);
-        //     std::cout<<"my_point_filter_map_sph size "<<my_point_filter_map_sph->points.size()<<std::endl;
-        //     my_point_filter_map_sph->width = my_point_filter_map_sph->points.size();
-        //     my_point_filter_map_sph->height = 1;
-        //     for(auto & point : my_point_filter_map_sph->points){
-        //         point.r = 255;
-        //         point.g = 0;
-        //         point.b = 0;
-        //     }
-        //     pcl::transformPointCloud(*my_point_filter_map_sph, *my_point_filter_map_sph, recover_pose);
-        //     pcl::io::savePLYFileASCII("/home/mt_eb1/LYX/filter_noise_point/Table/my_point/my_point_filter_map_sph.ply", *my_point_filter_map_sph);
-        //     my_point_curr_frame_in_same_map_sph->width = my_point_curr_frame_in_same_map_sph->points.size();
-        //     std::cout<<"my_point_curr_frame_in_same_map_sph size "<<my_point_curr_frame_in_same_map_sph->points.size()<<std::endl;
-        //     my_point_curr_frame_in_same_map_sph->height = 1;
-        //     // for(auto & point : *my_point_curr_frame_in_same_map_sph){
-        //     //     point.r = 0;
-        //     //     point.g = 255;
-        //     //     point.b = 0;
-        //     //     std::cout<<"point.x "<<point.x<<" point.y "<<point.y<<" point.z "<<point.z<<std::endl;
-        //     // }
-        //     pcl::transformPointCloud(*my_point_curr_frame_in_same_map_sph, *my_point_curr_frame_in_same_map_sph, recover_pose);
-        //     pcl::io::savePLYFileASCII("/home/mt_eb1/LYX/filter_noise_point/Table/my_point/my_point_curr_frame_in_same_map_sph.ply", *my_point_curr_frame_in_same_map_sph);
-        //     break;
-        // }
-        //test
-
-        // if(pose_index == stop_index){
-        //     break;
-        // }   
+        // save_pointcloud();
     }
-
+    
+        );
+    // 单线程和多线程。注释掉TBB，改变开始的for循环
     save_pointcloud();
+    // Eigen::Matrix4f save_curr = pose_matrix[stop_index];
+    // PointT ori_point;
+    // //请将save_curr位移部分赋值给ori_point的xyz
+    // ori_point.x = save_curr(0,3);ori_point.y = save_curr(1,3);ori_point.z = save_curr(2,3);ori_point.g =255;
+    // auto temp_cloud = ori_pointcloud_list[stop_index];
+    // temp_cloud->points.push_back(ori_point);
+    // temp_cloud->width = temp_cloud->points.size();
+    // temp_cloud->height = 1;
+    // pcl::io::savePLYFileASCII(base_path+"/out/"+std::to_string(stop_index)+"frame.ply", *ori_pointcloud_list[stop_index]);
 }
 
 
@@ -529,14 +462,34 @@ void PointCloudCart2Sph::get_depth_image_show(){
 void PointCloudCart2Sph::save_pointcloud(){
     pcl::PointCloud<PointT>::Ptr filter_point(new pcl::PointCloud<PointT>);
     pcl::PointCloud<PointT>::Ptr true_pointcloud(new pcl::PointCloud<PointT>);
-    pcl::PointCloud<PointT>::Ptr all_points_(new pcl::PointCloud<PointT>);
+    // pcl::PointCloud<PointT>::Ptr all_points_(new pcl::PointCloud<PointT>);
     // for(int pointcloud_index = 0 ; pointcloud_index < ori_pointcloud_list.size();pointcloud_index++){
     //     pcl::io::savePLYFileASCII("/home/mt_eb1/LYX/filter_noise_point/Table/"+std::to_string(pointcloud_index)+".ply", *ori_pointcloud_list[pointcloud_index]);
     // }
+    // mtx.lock();
+    // mtx.unlock();
+    auto copy_ori_pointcloudIndex_pointIndex_status = ori_pointcloudIndex_pointIndex_status;
+    for(auto &vector :copy_ori_pointcloudIndex_pointIndex_status){
+        std::sort(vector.begin(), vector.end(),std::greater<int>());
+    }
+    int count = 0;
+    int count_time = 0;
+    for(auto &vector :copy_ori_pointcloudIndex_pointIndex_status){
+        if(vector[1] >1){
+            count+=vector[1];
+            count_time++;
+        }
+        
+    }
+    count=count/(2*count_time);
+    //test
+    // count = 0;
+    //test
+    std::cout<<"count "<<count<<std::endl;
     for(int pointcloud_of_map_ptr_index = 0 ; pointcloud_of_map_ptr_index < ori_pointcloud_list.size();pointcloud_of_map_ptr_index++ ){
-        *all_points_ += *ori_pointcloud_list[pointcloud_of_map_ptr_index];
+        // *all_points_ += *ori_pointcloud_list[pointcloud_of_map_ptr_index];
         for(int point_index = 0 ;point_index < ori_pointcloud_list[pointcloud_of_map_ptr_index]->points.size();point_index++){
-            if(ori_pointcloudIndex_pointIndex_status[pointcloud_of_map_ptr_index][point_index] > 2){
+            if(ori_pointcloudIndex_pointIndex_status[pointcloud_of_map_ptr_index][point_index] > count){
                 filter_point->points.push_back(ori_pointcloud_list[pointcloud_of_map_ptr_index]->points[point_index]);
                 // std::cout<<"ori_pointcloudIndex_pointIndex_status[pointcloud_of_map_ptr_index][point_index] "<<ori_pointcloudIndex_pointIndex_status[pointcloud_of_map_ptr_index][point_index]<<std::endl;
             }else{
@@ -551,17 +504,36 @@ void PointCloudCart2Sph::save_pointcloud(){
     }
     // pcl::transformPointCloud(*filter_point, *filter_point, recover_pose);
     // pcl::transformPointCloud(*true_pointcloud, *true_pointcloud, recover_pose);
+    Eigen::Matrix4f save_curr = pose_matrix[50];
     PointT ori_point;
-    ori_point.x = 0;ori_point.y = 0;ori_point.z = 0;ori_point.g = 255;
-    all_points_->points.push_back(ori_point);true_pointcloud->points.push_back(ori_point);filter_point->points.push_back(ori_point);
-    all_points_->width = all_points_->points.size();true_pointcloud->width = true_pointcloud->points.size();filter_point->width = filter_point->points.size();
-    all_points_->height = 1;true_pointcloud->height = 1;filter_point->height = 1;
+    //请将save_curr位移部分赋值给ori_point的xyz
+    ori_point.x = save_curr(0,3);ori_point.y = save_curr(1,3);ori_point.z = save_curr(2,3);ori_point.g =255;
+    // all_points_->points.push_back(ori_point);true_pointcloud->points.push_back(ori_point);filter_point->points.push_back(ori_point);
+    // all_points_->width = all_points_->points.size();true_pointcloud->width = true_pointcloud->points.size();filter_point->width = filter_point->points.size();
+    // all_points_->height = 1;true_pointcloud->height = 1;filter_point->height = 1;
     // pcl::io::savePLYFileASCII("/home/mt_eb1/LYX/filter_noise_point/Table/all_points.ply", *all_points_);
-    pcl::transformPointCloud(*filter_point, *filter_point, recover_pose);
-    pcl::io::savePLYFileASCII("/home/mt_eb1/LYX/filter_noise_point/Table/filter_point>0.10.ply", *filter_point);
-    pcl::transformPointCloud(*true_pointcloud, *true_pointcloud, recover_pose);
-    pcl::io::savePLYFileASCII("/home/mt_eb1/LYX/filter_noise_point/Table/true_pointcloud.ply", *true_pointcloud);
-     
+    // pcl::transformPointCloud(*filter_point, *filter_point, recover_pose);
+    //如果/home/mt_eb1/LYX/DataFromServe/HongKongData/MT20241129-100544路径下不存在out文件夹，则创建
+    if(!fs::exists(pointcloud_save_path+pointcloud_save_file)){
+        fs::create_directory(pointcloud_save_path+pointcloud_save_file);
+        std::cout<<"Directory created successfully "<< std::endl;
+    }else{
+        std::cout << "Directory already exists" << std::endl;
+    }
+    std::cout<<"filter_point->points.size() "<<filter_point->points.size()<<std::endl;
+    filter_point->width = filter_point->points.size();
+    filter_point->height = 1;
+    pcl::io::savePLYFileASCII(pointcloud_save_path+pointcloud_save_file+"filtered_point.ply", *filter_point);
+    filter_point->clear();
+    // pcl::transformPointCloud(*true_pointcloud, *true_pointcloud, recover_pose);
+    std::cout<<"true_pointcloud->points.size() "<<true_pointcloud->points.size()<<std::endl;
+    true_pointcloud->width = true_pointcloud->points.size();
+    true_pointcloud->height = 1;
+    pcl::io::savePLYFileASCII(pointcloud_save_path+pointcloud_save_file+"true_pointcloud.ply", *true_pointcloud);
+    PointInSphGrid->width = PointInSphGrid->points.size();
+    PointInSphGrid->height = 1;
+    pcl::io::savePLYFileASCII(pointcloud_save_path+pointcloud_save_file+"PointInSphGrid.ply", *PointInSphGrid);
+    true_pointcloud->clear();
 }
 // float PointCloudCart2Sph::get_point_in_sph_theta(const pointXYZRGBHM& point){
 //     const float& x = point.xyz.x();
@@ -834,3 +806,33 @@ void PointCloudCart2Sph::save_pointcloud(){
 //     return pointcloud_list;
 // }
 
+
+int PointCloudCart2Sph:: get_testpoint_sphindex(PointT& test_point,int& pose_num){
+    PointInSphGrid->push_back(test_point);
+    auto curr_pose = pose_matrix[pose_num];
+    Eigen::Matrix<float, 4, 1> test_point_eigen(test_point.x, test_point.y, test_point.z, 1);
+    test_point_eigen = curr_pose.inverse()*test_point_eigen;
+    test_point.x = test_point_eigen(0);test_point.y = test_point_eigen(1);test_point.z = test_point_eigen(2);test_point.g = 255;
+    float theta = get_point_in_sph_theta(test_point);
+    float phi = get_point_in_sph_phi(test_point);
+    int index = index_in_vector_of_sphgrid(theta, phi);
+    return index;
+}
+
+void PointCloudCart2Sph:: obvious_point(int test_point_sphindex, PointT local_MapPoint, int& pose_num){
+    auto curr_pose = pose_matrix[pose_num];
+
+    float local_MapPoint_theta = get_point_in_sph_theta(local_MapPoint);
+    float local_MapPoint_phi = get_point_in_sph_phi(local_MapPoint);
+    int local_MapPoint_index = index_in_vector_of_sphgrid(local_MapPoint_theta, local_MapPoint_phi);
+
+
+    if(local_MapPoint_index == test_point_sphindex){
+        PointT world_point(local_MapPoint);
+        Eigen::Matrix<float, 4, 1> test_point_eigen(local_MapPoint.x, local_MapPoint.y, local_MapPoint.z, 1);
+        test_point_eigen = curr_pose*test_point_eigen;
+        world_point.x = test_point_eigen(0);world_point.y = test_point_eigen(1);world_point.z = test_point_eigen(2);
+        PointInSphGrid->points.push_back(world_point);
+    }
+    
+}

@@ -7,6 +7,7 @@
 #include <fstream>
 #include <map>
 #include <unordered_map>
+#include <filesystem>
 
 // #include <opencv2/opencv.hpp>
 #include <eigen3/Eigen/Dense>
@@ -138,6 +139,7 @@ class NERF_PRE
     
     std::vector<pcl::PointCloud<pcl::PointXYZRGBL>::Ptr> run(std::string lx_file_name, float downsample_size,std::vector<Eigen::Matrix4d> &pose_list);
     pcl::PointCloud<pcl::PointXYZRGBL>::Ptr run2(std::string lx_file_name,std::vector<Eigen::Matrix4d> &pose_list);
+    void save_frame_ply(pcl::PointCloud<pcl::PointXYZRGBL>::Ptr cloud, std::string save_path);
 };
 
 #endif

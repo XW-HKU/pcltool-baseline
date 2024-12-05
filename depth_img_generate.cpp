@@ -85,6 +85,7 @@ int main(int argc, char** argv) {
         // ///test
         auto start = std::chrono::high_resolution_clock::now();
         PointCloudCart2Sph pointcloud_cart2sph(pointcloud_list_map_, transform_list, rad_resolution, alpha_resolution);
+        std::cout<<"pointcloud_cart2sph init done"<<std::endl;
         pointcloud_cart2sph.delete_virual_pointcloud();
         // pointcloud_cart2sph.get_depth_image_show();
         auto end = std::chrono::high_resolution_clock::now();
