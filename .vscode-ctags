@@ -1,0 +1,256 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_OUTPUT_MODE	u-ctags	/u-ctags or e-ctags/
+!_TAG_PROGRAM_AUTHOR	Universal Ctags Team	//
+!_TAG_PROGRAM_NAME	Universal Ctags	/Derived from Exuberant Ctags/
+!_TAG_PROGRAM_URL	https://ctags.io/	/official site/
+!_TAG_PROGRAM_VERSION	0.0.0	//
+$(VERBOSE).SILENT	build/Makefile	/^$(VERBOSE).SILENT:$/;"	t
+ARCHITECTURE_ID	build/CMakeFiles/3.16.3/CompilerIdC/CMakeCCompilerId.c	/^#   define ARCHITECTURE_ID /;"	d	file:
+ARCHITECTURE_ID	build/CMakeFiles/3.16.3/CompilerIdC/CMakeCCompilerId.c	/^#  define ARCHITECTURE_ID /;"	d	file:
+ARCHITECTURE_ID	build/CMakeFiles/3.16.3/CompilerIdC/CMakeCCompilerId.c	/^#  define ARCHITECTURE_ID$/;"	d	file:
+ARCHITECTURE_ID	build/CMakeFiles/3.16.3/CompilerIdCXX/CMakeCXXCompilerId.cpp	/^#   define ARCHITECTURE_ID /;"	d	file:
+ARCHITECTURE_ID	build/CMakeFiles/3.16.3/CompilerIdCXX/CMakeCXXCompilerId.cpp	/^#  define ARCHITECTURE_ID /;"	d	file:
+ARCHITECTURE_ID	build/CMakeFiles/3.16.3/CompilerIdCXX/CMakeCXXCompilerId.cpp	/^#  define ARCHITECTURE_ID$/;"	d	file:
+CMAKE_BINARY_DIR	build/Makefile	/^CMAKE_BINARY_DIR = \/home\/mt_eb1\/LYX\/filter_noise_point\/pcltool-baseline\/build$/;"	m
+CMAKE_COMMAND	build/Makefile	/^CMAKE_COMMAND = \/usr\/bin\/cmake$/;"	m
+CMAKE_SOURCE_DIR	build/Makefile	/^CMAKE_SOURCE_DIR = \/home\/mt_eb1\/LYX\/filter_noise_point\/pcltool-baseline$/;"	m
+COMPILER_ID	build/CMakeFiles/3.16.3/CompilerIdC/CMakeCCompilerId.c	/^# define COMPILER_ID /;"	d	file:
+COMPILER_ID	build/CMakeFiles/3.16.3/CompilerIdCXX/CMakeCXXCompilerId.cpp	/^# define COMPILER_ID /;"	d	file:
+COMPILER_VERSION_INTERNAL	build/CMakeFiles/3.16.3/CompilerIdC/CMakeCCompilerId.c	/^#  define COMPILER_VERSION_INTERNAL /;"	d	file:
+COMPILER_VERSION_INTERNAL	build/CMakeFiles/3.16.3/CompilerIdC/CMakeCCompilerId.c	/^# define COMPILER_VERSION_INTERNAL /;"	d	file:
+COMPILER_VERSION_INTERNAL	build/CMakeFiles/3.16.3/CompilerIdCXX/CMakeCXXCompilerId.cpp	/^#  define COMPILER_VERSION_INTERNAL /;"	d	file:
+COMPILER_VERSION_INTERNAL	build/CMakeFiles/3.16.3/CompilerIdCXX/CMakeCXXCompilerId.cpp	/^# define COMPILER_VERSION_INTERNAL /;"	d	file:
+COMPILER_VERSION_MAJOR	build/CMakeFiles/3.16.3/CompilerIdC/CMakeCCompilerId.c	/^  # define COMPILER_VERSION_MAJOR /;"	d	file:
+COMPILER_VERSION_MAJOR	build/CMakeFiles/3.16.3/CompilerIdC/CMakeCCompilerId.c	/^#  define COMPILER_VERSION_MAJOR /;"	d	file:
+COMPILER_VERSION_MAJOR	build/CMakeFiles/3.16.3/CompilerIdC/CMakeCCompilerId.c	/^# define COMPILER_VERSION_MAJOR /;"	d	file:
+COMPILER_VERSION_MAJOR	build/CMakeFiles/3.16.3/CompilerIdCXX/CMakeCXXCompilerId.cpp	/^  # define COMPILER_VERSION_MAJOR /;"	d	file:
+COMPILER_VERSION_MAJOR	build/CMakeFiles/3.16.3/CompilerIdCXX/CMakeCXXCompilerId.cpp	/^#  define COMPILER_VERSION_MAJOR /;"	d	file:
+COMPILER_VERSION_MAJOR	build/CMakeFiles/3.16.3/CompilerIdCXX/CMakeCXXCompilerId.cpp	/^# define COMPILER_VERSION_MAJOR /;"	d	file:
+COMPILER_VERSION_MINOR	build/CMakeFiles/3.16.3/CompilerIdC/CMakeCCompilerId.c	/^  # define COMPILER_VERSION_MINOR /;"	d	file:
+COMPILER_VERSION_MINOR	build/CMakeFiles/3.16.3/CompilerIdC/CMakeCCompilerId.c	/^#  define COMPILER_VERSION_MINOR /;"	d	file:
+COMPILER_VERSION_MINOR	build/CMakeFiles/3.16.3/CompilerIdC/CMakeCCompilerId.c	/^# define COMPILER_VERSION_MINOR /;"	d	file:
+COMPILER_VERSION_MINOR	build/CMakeFiles/3.16.3/CompilerIdCXX/CMakeCXXCompilerId.cpp	/^  # define COMPILER_VERSION_MINOR /;"	d	file:
+COMPILER_VERSION_MINOR	build/CMakeFiles/3.16.3/CompilerIdCXX/CMakeCXXCompilerId.cpp	/^#  define COMPILER_VERSION_MINOR /;"	d	file:
+COMPILER_VERSION_MINOR	build/CMakeFiles/3.16.3/CompilerIdCXX/CMakeCXXCompilerId.cpp	/^# define COMPILER_VERSION_MINOR /;"	d	file:
+COMPILER_VERSION_PATCH	build/CMakeFiles/3.16.3/CompilerIdC/CMakeCCompilerId.c	/^  # define COMPILER_VERSION_PATCH /;"	d	file:
+COMPILER_VERSION_PATCH	build/CMakeFiles/3.16.3/CompilerIdC/CMakeCCompilerId.c	/^#   define COMPILER_VERSION_PATCH /;"	d	file:
+COMPILER_VERSION_PATCH	build/CMakeFiles/3.16.3/CompilerIdC/CMakeCCompilerId.c	/^#  define COMPILER_VERSION_PATCH /;"	d	file:
+COMPILER_VERSION_PATCH	build/CMakeFiles/3.16.3/CompilerIdC/CMakeCCompilerId.c	/^# define COMPILER_VERSION_PATCH /;"	d	file:
+COMPILER_VERSION_PATCH	build/CMakeFiles/3.16.3/CompilerIdCXX/CMakeCXXCompilerId.cpp	/^  # define COMPILER_VERSION_PATCH /;"	d	file:
+COMPILER_VERSION_PATCH	build/CMakeFiles/3.16.3/CompilerIdCXX/CMakeCXXCompilerId.cpp	/^#   define COMPILER_VERSION_PATCH /;"	d	file:
+COMPILER_VERSION_PATCH	build/CMakeFiles/3.16.3/CompilerIdCXX/CMakeCXXCompilerId.cpp	/^#  define COMPILER_VERSION_PATCH /;"	d	file:
+COMPILER_VERSION_PATCH	build/CMakeFiles/3.16.3/CompilerIdCXX/CMakeCXXCompilerId.cpp	/^# define COMPILER_VERSION_PATCH /;"	d	file:
+COMPILER_VERSION_TWEAK	build/CMakeFiles/3.16.3/CompilerIdC/CMakeCCompilerId.c	/^#  define COMPILER_VERSION_TWEAK /;"	d	file:
+COMPILER_VERSION_TWEAK	build/CMakeFiles/3.16.3/CompilerIdC/CMakeCCompilerId.c	/^# define COMPILER_VERSION_TWEAK /;"	d	file:
+COMPILER_VERSION_TWEAK	build/CMakeFiles/3.16.3/CompilerIdCXX/CMakeCXXCompilerId.cpp	/^#  define COMPILER_VERSION_TWEAK /;"	d	file:
+COMPILER_VERSION_TWEAK	build/CMakeFiles/3.16.3/CompilerIdCXX/CMakeCXXCompilerId.cpp	/^# define COMPILER_VERSION_TWEAK /;"	d	file:
+CXX_STD	build/CMakeFiles/3.16.3/CompilerIdCXX/CMakeCXXCompilerId.cpp	/^#      define CXX_STD /;"	d	file:
+CXX_STD	build/CMakeFiles/3.16.3/CompilerIdCXX/CMakeCXXCompilerId.cpp	/^#    define CXX_STD /;"	d	file:
+CXX_STD	build/CMakeFiles/3.16.3/CompilerIdCXX/CMakeCXXCompilerId.cpp	/^#  define CXX_STD /;"	d	file:
+C_DIALECT	build/CMakeFiles/3.16.3/CompilerIdC/CMakeCCompilerId.c	/^#  define C_DIALECT /;"	d	file:
+C_DIALECT	build/CMakeFiles/3.16.3/CompilerIdC/CMakeCCompilerId.c	/^#  define C_DIALECT$/;"	d	file:
+C_DIALECT	build/CMakeFiles/3.16.3/CompilerIdC/CMakeCCompilerId.c	/^# define C_DIALECT /;"	d	file:
+CamPosIndScore	LX_tools/nerf_pre.h	/^        CamPosIndScore (uint32_t cam_pos_ind, float score)$/;"	f	struct:NERF_PRE::CamPosIndScore
+CamPosIndScore	LX_tools/nerf_pre.h	/^    struct CamPosIndScore$/;"	s	class:NERF_PRE
+DEC	build/CMakeFiles/3.16.3/CompilerIdC/CMakeCCompilerId.c	/^#define DEC(/;"	d	file:
+DEC	build/CMakeFiles/3.16.3/CompilerIdCXX/CMakeCXXCompilerId.cpp	/^#define DEC(/;"	d	file:
+EPS	depth_img_generate.cpp	/^#define EPS /;"	d	file:
+EQUALS	build/Makefile	/^EQUALS = =$/;"	m
+HEX	build/CMakeFiles/3.16.3/CompilerIdC/CMakeCCompilerId.c	/^#define HEX(/;"	d	file:
+HEX	build/CMakeFiles/3.16.3/CompilerIdCXX/CMakeCXXCompilerId.cpp	/^#define HEX(/;"	d	file:
+ID_VOID_MAIN	build/CMakeFiles/3.16.3/CompilerIdC/CMakeCCompilerId.c	/^# define ID_VOID_MAIN$/;"	d	file:
+LXFILTER_H	LX_tools/lx_tools.h	/^#define LXFILTER_H$/;"	d
+LX_ASCII	LX_tools/lx_tools.h	/^    LX_ASCII,$/;"	e	enum:e_lx_storage_mode_
+LX_BIG_ENDIAN	LX_tools/lx_tools.h	/^    LX_BIG_ENDIAN,$/;"	e	enum:e_lx_storage_mode_
+LX_DEFAULT	LX_tools/lx_tools.h	/^    LX_DEFAULT      \/* has to be the last in enum *\/$/;"	e	enum:e_lx_storage_mode_
+LX_DOUBLE	LX_tools/lx_tools.h	/^    LX_FLOAT, LX_DOUBLE,$/;"	e	enum:e_lx_type
+LX_FLOAT	LX_tools/lx_tools.h	/^    LX_FLOAT, LX_DOUBLE,$/;"	e	enum:e_lx_type
+LX_FLOAT32	LX_tools/lx_tools.h	/^    LX_FLOAT32, LX_FLOAT64,$/;"	e	enum:e_lx_type
+LX_FLOAT64	LX_tools/lx_tools.h	/^    LX_FLOAT32, LX_FLOAT64,$/;"	e	enum:e_lx_type
+LX_LITTLE_ENDIAN	LX_tools/lx_tools.h	/^    LX_LITTLE_ENDIAN,$/;"	e	enum:e_lx_storage_mode_
+LX_tools/lx_tool.cpp.i	build/Makefile	/^LX_tools\/lx_tool.cpp.i:$/;"	t
+LX_tools/lx_tool.cpp.o	build/Makefile	/^LX_tools\/lx_tool.cpp.o:$/;"	t
+LX_tools/lx_tool.cpp.s	build/Makefile	/^LX_tools\/lx_tool.cpp.s:$/;"	t
+LX_tools/lx_tool.i	build/Makefile	/^LX_tools\/lx_tool.i: LX_tools\/lx_tool.cpp.i$/;"	t
+LX_tools/lx_tool.o	build/Makefile	/^LX_tools\/lx_tool.o: LX_tools\/lx_tool.cpp.o$/;"	t
+LX_tools/lx_tool.s	build/Makefile	/^LX_tools\/lx_tool.s: LX_tools\/lx_tool.cpp.s$/;"	t
+LX_tools/nerf_pre.cpp.i	build/Makefile	/^LX_tools\/nerf_pre.cpp.i:$/;"	t
+LX_tools/nerf_pre.cpp.o	build/Makefile	/^LX_tools\/nerf_pre.cpp.o:$/;"	t
+LX_tools/nerf_pre.cpp.s	build/Makefile	/^LX_tools\/nerf_pre.cpp.s:$/;"	t
+LX_tools/nerf_pre.i	build/Makefile	/^LX_tools\/nerf_pre.i: LX_tools\/nerf_pre.cpp.i$/;"	t
+LX_tools/nerf_pre.o	build/Makefile	/^LX_tools\/nerf_pre.o: LX_tools\/nerf_pre.cpp.o$/;"	t
+LX_tools/nerf_pre.s	build/Makefile	/^LX_tools\/nerf_pre.s: LX_tools\/nerf_pre.cpp.s$/;"	t
+LxTools	LX_tools/lx_tools.h	/^    LxTools(){};$/;"	f	class:LxTools
+LxTools	LX_tools/lx_tools.h	/^class LxTools$/;"	c
+MD5_BYTE_STRING_LEN	LX_tools/lx_tools.h	/^    #define MD5_BYTE_STRING_LEN /;"	d
+MD5_SECRET_LEN_16	LX_tools/lx_tools.h	/^    #define MD5_SECRET_LEN_16 /;"	d
+MIN_DEPTH	depth_img_generate.cpp	/^#define MIN_DEPTH /;"	d	file:
+Mat_height	depth_img_generate.cpp	/^    int Mat_height = (max_height - min_height)\/height_resolution;$/;"	m	struct:pointcloud_map_in_cam	typeref:typename:int	file:
+Mat_width	depth_img_generate.cpp	/^    int Mat_width =  M_PI\/rad_resolution;$/;"	m	struct:pointcloud_map_in_cam	typeref:typename:int	file:
+MyHash	LX_tools/nerf_pre.h	/^    struct MyHash {$/;"	s	class:VoxelDownsampleFilter
+NERF_PRE	LX_tools/nerf_pre.h	/^    NERF_PRE()$/;"	f	class:NERF_PRE
+NERF_PRE	LX_tools/nerf_pre.h	/^class NERF_PRE$/;"	c
+NERF_PRE_H	LX_tools/nerf_pre.h	/^#define NERF_PRE_H$/;"	d
+PLATFORM_ID	build/CMakeFiles/3.16.3/CompilerIdC/CMakeCCompilerId.c	/^#  define PLATFORM_ID /;"	d	file:
+PLATFORM_ID	build/CMakeFiles/3.16.3/CompilerIdC/CMakeCCompilerId.c	/^#  define PLATFORM_ID$/;"	d	file:
+PLATFORM_ID	build/CMakeFiles/3.16.3/CompilerIdC/CMakeCCompilerId.c	/^# define PLATFORM_ID /;"	d	file:
+PLATFORM_ID	build/CMakeFiles/3.16.3/CompilerIdC/CMakeCCompilerId.c	/^# define PLATFORM_ID$/;"	d	file:
+PLATFORM_ID	build/CMakeFiles/3.16.3/CompilerIdCXX/CMakeCXXCompilerId.cpp	/^#  define PLATFORM_ID /;"	d	file:
+PLATFORM_ID	build/CMakeFiles/3.16.3/CompilerIdCXX/CMakeCXXCompilerId.cpp	/^#  define PLATFORM_ID$/;"	d	file:
+PLATFORM_ID	build/CMakeFiles/3.16.3/CompilerIdCXX/CMakeCXXCompilerId.cpp	/^# define PLATFORM_ID /;"	d	file:
+PLATFORM_ID	build/CMakeFiles/3.16.3/CompilerIdCXX/CMakeCXXCompilerId.cpp	/^# define PLATFORM_ID$/;"	d	file:
+PointCloudCart2Sph	PointCloudCart2Sph/PointCloudCart2Sph.h	/^        PointCloudCart2Sph(pcl::PointCloud<PointT>::Ptr pointcloud_, Eigen::Matrix4d &pose_matri/;"	f	class:PointCloudCart2Sph
+PointCloudCart2Sph	PointCloudCart2Sph/PointCloudCart2Sph.h	/^class PointCloudCart2Sph{ $/;"	c
+PointT	PointCloudCart2Sph/PointCloudCart2Sph.h	/^typedef pcl::PointXYZRGBL PointT;$/;"	t	typeref:typename:pcl::PointXYZRGBL
+PointXYZRGBI	LX_tools/lx_tools.h	/^class PointXYZRGBI$/;"	c
+RM	build/Makefile	/^RM = \/usr\/bin\/cmake -E remove -f$/;"	m
+SHELL	build/Makefile	/^SHELL = \/bin\/sh$/;"	m
+SIMULATE_ID	build/CMakeFiles/3.16.3/CompilerIdC/CMakeCCompilerId.c	/^#  define SIMULATE_ID /;"	d	file:
+SIMULATE_ID	build/CMakeFiles/3.16.3/CompilerIdCXX/CMakeCXXCompilerId.cpp	/^#  define SIMULATE_ID /;"	d	file:
+SIMULATE_VERSION_MAJOR	build/CMakeFiles/3.16.3/CompilerIdC/CMakeCCompilerId.c	/^#  define SIMULATE_VERSION_MAJOR /;"	d	file:
+SIMULATE_VERSION_MAJOR	build/CMakeFiles/3.16.3/CompilerIdCXX/CMakeCXXCompilerId.cpp	/^#  define SIMULATE_VERSION_MAJOR /;"	d	file:
+SIMULATE_VERSION_MINOR	build/CMakeFiles/3.16.3/CompilerIdC/CMakeCCompilerId.c	/^#  define SIMULATE_VERSION_MINOR /;"	d	file:
+SIMULATE_VERSION_MINOR	build/CMakeFiles/3.16.3/CompilerIdCXX/CMakeCXXCompilerId.cpp	/^#  define SIMULATE_VERSION_MINOR /;"	d	file:
+SIMULATE_VERSION_PATCH	build/CMakeFiles/3.16.3/CompilerIdC/CMakeCCompilerId.c	/^#  define SIMULATE_VERSION_PATCH /;"	d	file:
+SIMULATE_VERSION_PATCH	build/CMakeFiles/3.16.3/CompilerIdCXX/CMakeCXXCompilerId.cpp	/^#  define SIMULATE_VERSION_PATCH /;"	d	file:
+STRINGIFY	build/CMakeFiles/3.16.3/CompilerIdC/CMakeCCompilerId.c	/^#define STRINGIFY(/;"	d	file:
+STRINGIFY	build/CMakeFiles/3.16.3/CompilerIdCXX/CMakeCXXCompilerId.cpp	/^#define STRINGIFY(/;"	d	file:
+STRINGIFY_HELPER	build/CMakeFiles/3.16.3/CompilerIdC/CMakeCCompilerId.c	/^#define STRINGIFY_HELPER(/;"	d	file:
+STRINGIFY_HELPER	build/CMakeFiles/3.16.3/CompilerIdCXX/CMakeCXXCompilerId.cpp	/^#define STRINGIFY_HELPER(/;"	d	file:
+SUFFIXES	build/Makefile	/^SUFFIXES =$/;"	m
+SphGridMap	PointCloudCart2Sph/PointCloudCart2Sph.h	/^struct SphGridMap{$/;"	s
+Sphgrid	PointCloudCart2Sph/PointCloudCart2Sph.h	/^        struct Sphgrid{$/;"	s	class:PointCloudCart2Sph
+T_i_l_	LX_tools/nerf_pre.h	/^    Eigen::Matrix4d T_i_l_;$/;"	m	class:NERF_PRE	typeref:typename:Eigen::Matrix4d
+VoxelDownsampleFilter	LX_tools/nerf_pre.h	/^    VoxelDownsampleFilter(float resolution) : resolution_(resolution) {};$/;"	f	class:VoxelDownsampleFilter
+VoxelDownsampleFilter	LX_tools/nerf_pre.h	/^class VoxelDownsampleFilter$/;"	c
+XAxis	PointCloudCart2Sph/PointCloudCart2Sph.h	/^        Eigen::Vector3f XAxis;$/;"	m	class:PointCloudCart2Sph	typeref:typename:Eigen::Vector3f
+YAxis	PointCloudCart2Sph/PointCloudCart2Sph.h	/^        Eigen::Vector3f YAxis;$/;"	m	class:PointCloudCart2Sph	typeref:typename:Eigen::Vector3f
+ZAxis	PointCloudCart2Sph/PointCloudCart2Sph.h	/^        Eigen::Vector3f ZAxis;$/;"	m	class:PointCloudCart2Sph	typeref:typename:Eigen::Vector3f
+__anon09db1a310102	depth_img_generate.cpp	/^        [&](const tbb::blocked_range<size_t>& r) {$/;"	f	function:main	file:
+all	build/Makefile	/^all: cmake_check_build_system$/;"	t
+cam_pos_ind	LX_tools/nerf_pre.h	/^        uint32_t cam_pos_ind;$/;"	m	struct:NERF_PRE::CamPosIndScore	typeref:typename:uint32_t
+clean	build/Makefile	/^clean:$/;"	t
+clean/fast	build/Makefile	/^clean\/fast: clean$/;"	t
+cloud_frame_list_	LX_tools/lx_tools.h	/^    std::vector<pcl::PointCloud<pcl::PointXYZRGBL>::Ptr> cloud_frame_list_;$/;"	m	class:LxTools	typeref:typename:std::vector<pcl::PointCloud<pcl::PointXYZRGBL>::Ptr>
+cmake_check_build_system	build/Makefile	/^cmake_check_build_system:$/;"	t
+cmake_force	build/Makefile	/^cmake_force:$/;"	t
+commonMd5Secret32	LX_tools/lx_tools.h	/^    void commonMd5Secret32(const char *src, size_t srcSize, char *result)$/;"	f	class:LxTools	typeref:typename:void
+const	build/CMakeFiles/3.16.3/CompilerIdC/CMakeCCompilerId.c	/^# define const$/;"	d	file:
+crc32	LX_tools/lx_tools.h	/^    uint32_t crc32(const char *src, size_t length)$/;"	f	class:LxTools	typeref:typename:uint32_t
+crcRlt	LX_tools/lx_tools.h	/^        int32_t crcRlt;$/;"	m	class:section2	typeref:typename:int32_t
+cryptStr	LX_tools/lx_tools.h	/^        char cryptStr[MD5_SECRET_LEN_16 * 2 + 1];$/;"	m	class:section	typeref:typename:char[]
+data_map_	LX_tools/nerf_pre.h	/^    std::unordered_map<Eigen::Vector3i, bool, MyHash>  data_map_;$/;"	m	class:VoxelDownsampleFilter	typeref:typename:std::unordered_map<Eigen::Vector3i,bool,MyHash>
+default_target	build/Makefile	/^default_target: all$/;"	t
+depend	build/Makefile	/^depend:$/;"	t
+depth_img_generate	build/Makefile	/^depth_img_generate: cmake_check_build_system$/;"	t
+depth_img_generate.cpp.i	build/Makefile	/^depth_img_generate.cpp.i:$/;"	t
+depth_img_generate.cpp.o	build/Makefile	/^depth_img_generate.cpp.o:$/;"	t
+depth_img_generate.cpp.s	build/Makefile	/^depth_img_generate.cpp.s:$/;"	t
+depth_img_generate.i	build/Makefile	/^depth_img_generate.i: depth_img_generate.cpp.i$/;"	t
+depth_img_generate.o	build/Makefile	/^depth_img_generate.o: depth_img_generate.cpp.o$/;"	t
+depth_img_generate.s	build/Makefile	/^depth_img_generate.s: depth_img_generate.cpp.s$/;"	t
+depth_img_generate/fast	build/Makefile	/^depth_img_generate\/fast:$/;"	t
+displacement	PointCloudCart2Sph/PointCloudCart2Sph.h	/^        Eigen::Vector3f displacement;$/;"	m	class:PointCloudCart2Sph	typeref:typename:Eigen::Vector3f
+e_lx_storage_mode	LX_tools/lx_tools.h	/^} e_lx_storage_mode; \/* order matches ply_storage_mode_list *\/$/;"	t	typeref:enum:e_lx_storage_mode_
+e_lx_storage_mode_	LX_tools/lx_tools.h	/^typedef enum e_lx_storage_mode_ {$/;"	g
+e_lx_storage_mode_names	LX_tools/lx_tools.h	/^static const char e_lx_storage_mode_names[][24]={"LX_BIG_ENDIAN","LX_LITTLE_ENDIAN"};$/;"	v	typeref:typename:const char[][24]
+e_lx_type	LX_tools/lx_tools.h	/^typedef enum e_lx_type {$/;"	g
+e_lx_type	LX_tools/lx_tools.h	/^} e_lx_type;$/;"	t	typeref:enum:e_lx_type
+e_lx_type_names	LX_tools/lx_tools.h	/^static const char e_lx_type_names[][12]= {$/;"	v	typeref:typename:const char[][12]
+edit_cache	build/Makefile	/^edit_cache:$/;"	t
+edit_cache/fast	build/Makefile	/^edit_cache\/fast: edit_cache$/;"	t
+eps	PointCloudCart2Sph/PointCloudCart2Sph.h	/^        double eps = 0.00000001;$/;"	m	class:PointCloudCart2Sph	typeref:typename:double
+fill_points	PointCloudCart2Sph/PointCloudCart2Sph.h	/^            void fill_points(const PointT& point){$/;"	f	struct:PointCloudCart2Sph::Sphgrid	typeref:typename:void
+filt	LX_tools/nerf_pre.h	/^    void filt(pcl::PointCloud<pcl::PointXYZRGBL>::Ptr cloud_in, pcl::PointCloud<pcl::PointXYZRGB/;"	f	class:VoxelDownsampleFilter	typeref:typename:void
+get_point_height_index_in_Mat_height	depth_img_generate.cpp	/^int get_point_height_index_in_Mat_height(const PointT &point){$/;"	f	typeref:typename:int
+get_point_in_sph_phi	PointCloudCart2Sph/PointCloudCart2Sph.cpp	/^float PointCloudCart2Sph::get_point_in_sph_phi(const PointT& point){$/;"	f	class:PointCloudCart2Sph	typeref:typename:float
+get_point_in_sph_theta	PointCloudCart2Sph/PointCloudCart2Sph.cpp	/^float PointCloudCart2Sph::get_point_in_sph_theta(const PointT& point){$/;"	f	class:PointCloudCart2Sph	typeref:typename:float
+get_point_rad_index_in_Mat_width	depth_img_generate.cpp	/^int get_point_rad_index_in_Mat_width(const PointT &point,const Eigen::Matrix4d &pose_matrix){$/;"	f	typeref:typename:int
+height_resolution	depth_img_generate.cpp	/^float height_resolution = 0.02;$/;"	v	typeref:typename:float
+help	build/Makefile	/^help:$/;"	t
+index_in_vector_of_sphgrid	PointCloudCart2Sph/PointCloudCart2Sph.h	/^        int index_in_vector_of_sphgrid(const float &theta, const float &phi){$/;"	f	class:PointCloudCart2Sph	typeref:typename:int
+info_arch	build/CMakeFiles/3.16.3/CompilerIdC/CMakeCCompilerId.c	/^char const* info_arch = "INFO" ":" "arch[" ARCHITECTURE_ID "]";$/;"	v	typeref:typename:char const *
+info_arch	build/CMakeFiles/3.16.3/CompilerIdCXX/CMakeCXXCompilerId.cpp	/^char const* info_arch = "INFO" ":" "arch[" ARCHITECTURE_ID "]";$/;"	v	typeref:typename:char const *
+info_compiler	build/CMakeFiles/3.16.3/CompilerIdC/CMakeCCompilerId.c	/^char const* info_compiler = "INFO" ":" "compiler[" COMPILER_ID "]";$/;"	v	typeref:typename:char const *
+info_compiler	build/CMakeFiles/3.16.3/CompilerIdCXX/CMakeCXXCompilerId.cpp	/^char const* info_compiler = "INFO" ":" "compiler[" COMPILER_ID "]";$/;"	v	typeref:typename:char const *
+info_cray	build/CMakeFiles/3.16.3/CompilerIdC/CMakeCCompilerId.c	/^char const *info_cray = "INFO" ":" "compiler_wrapper[CrayPrgEnv]";$/;"	v	typeref:typename:char const *
+info_cray	build/CMakeFiles/3.16.3/CompilerIdCXX/CMakeCXXCompilerId.cpp	/^char const *info_cray = "INFO" ":" "compiler_wrapper[CrayPrgEnv]";$/;"	v	typeref:typename:char const *
+info_language_dialect_default	build/CMakeFiles/3.16.3/CompilerIdC/CMakeCCompilerId.c	/^const char* info_language_dialect_default =$/;"	v	typeref:typename:const char *
+info_language_dialect_default	build/CMakeFiles/3.16.3/CompilerIdCXX/CMakeCXXCompilerId.cpp	/^const char* info_language_dialect_default = "INFO" ":" "dialect_default["$/;"	v	typeref:typename:const char *
+info_platform	build/CMakeFiles/3.16.3/CompilerIdC/CMakeCCompilerId.c	/^char const* info_platform = "INFO" ":" "platform[" PLATFORM_ID "]";$/;"	v	typeref:typename:char const *
+info_platform	build/CMakeFiles/3.16.3/CompilerIdCXX/CMakeCXXCompilerId.cpp	/^char const* info_platform = "INFO" ":" "platform[" PLATFORM_ID "]";$/;"	v	typeref:typename:char const *
+info_simulate	build/CMakeFiles/3.16.3/CompilerIdC/CMakeCCompilerId.c	/^char const* info_simulate = "INFO" ":" "simulate[" SIMULATE_ID "]";$/;"	v	typeref:typename:char const *
+info_simulate	build/CMakeFiles/3.16.3/CompilerIdCXX/CMakeCXXCompilerId.cpp	/^char const* info_simulate = "INFO" ":" "simulate[" SIMULATE_ID "]";$/;"	v	typeref:typename:char const *
+info_simulate_version	build/CMakeFiles/3.16.3/CompilerIdC/CMakeCCompilerId.c	/^char const info_simulate_version[] = {$/;"	v	typeref:typename:char const[]
+info_simulate_version	build/CMakeFiles/3.16.3/CompilerIdCXX/CMakeCXXCompilerId.cpp	/^char const info_simulate_version[] = {$/;"	v	typeref:typename:char const[]
+info_version	build/CMakeFiles/3.16.3/CompilerIdC/CMakeCCompilerId.c	/^char const info_version[] = {$/;"	v	typeref:typename:char const[]
+info_version	build/CMakeFiles/3.16.3/CompilerIdCXX/CMakeCXXCompilerId.cpp	/^char const info_version[] = {$/;"	v	typeref:typename:char const[]
+info_version_internal	build/CMakeFiles/3.16.3/CompilerIdC/CMakeCCompilerId.c	/^char const info_version_internal[] = {$/;"	v	typeref:typename:char const[]
+info_version_internal	build/CMakeFiles/3.16.3/CompilerIdCXX/CMakeCXXCompilerId.cpp	/^char const info_version_internal[] = {$/;"	v	typeref:typename:char const[]
+ledia_imp_key	LX_tools/lx_tools.h	/^        int32_t ledia_imp_key;$/;"	m	class:section	typeref:typename:int32_t
+ledia_imp_key	LX_tools/lx_tools.h	/^        int32_t ledia_imp_key;$/;"	m	class:section2	typeref:typename:int32_t
+local_pointcloud_sphgrid	PointCloudCart2Sph/PointCloudCart2Sph.h	/^        std::vector<Sphgrid> local_pointcloud_sphgrid;$/;"	m	class:PointCloudCart2Sph	typeref:typename:std::vector<Sphgrid>
+lx_file_name_	LX_tools/nerf_pre.h	/^    std::string lx_file_name_;$/;"	m	class:NERF_PRE	typeref:typename:std::string
+main	build/CMakeFiles/3.16.3/CompilerIdC/CMakeCCompilerId.c	/^int main(argc, argv) int argc; char *argv[];$/;"	f
+main	build/CMakeFiles/3.16.3/CompilerIdC/CMakeCCompilerId.c	/^void main() {}$/;"	f	typeref:typename:void
+main	build/CMakeFiles/3.16.3/CompilerIdCXX/CMakeCXXCompilerId.cpp	/^int main(int argc, char* argv[])$/;"	f	typeref:typename:int
+main	depth_img_generate.cpp	/^int main(int argc, char** argv) {$/;"	f	typeref:typename:int
+main	voxel_filter.cpp	/^int main(int argc, char** argv)$/;"	f	typeref:typename:int
+max_height	depth_img_generate.cpp	/^float max_height = 2;$/;"	v	typeref:typename:float
+min_height	depth_img_generate.cpp	/^float min_height = -1;$/;"	v	typeref:typename:float
+need_undistort_	LX_tools/nerf_pre.h	/^    bool need_undistort_ = false;$/;"	m	class:NERF_PRE	typeref:typename:bool
+operator ()	LX_tools/nerf_pre.h	/^        std::size_t operator()(const Eigen::Matrix<T,2,1> & vec2) const {$/;"	f	struct:VoxelDownsampleFilter::MyHash	typeref:typename:std::size_t
+operator ()	LX_tools/nerf_pre.h	/^        std::size_t operator()(const Eigen::Matrix<T,3,1> & vec3) const {$/;"	f	struct:VoxelDownsampleFilter::MyHash	typeref:typename:std::size_t
+operator ==	PointCloudCart2Sph/PointCloudCart2Sph.h	/^            bool operator==(const Sphgrid& other) const {$/;"	f	struct:PointCloudCart2Sph::Sphgrid	typeref:typename:bool
+phi_index	PointCloudCart2Sph/PointCloudCart2Sph.h	/^            int phi_index;$/;"	m	struct:PointCloudCart2Sph::Sphgrid	typeref:typename:int
+phi_resolution	PointCloudCart2Sph/PointCloudCart2Sph.h	/^        float phi_resolution;$/;"	m	class:PointCloudCart2Sph	typeref:typename:float
+phi_size	PointCloudCart2Sph/PointCloudCart2Sph.h	/^        int phi_size;$/;"	m	class:PointCloudCart2Sph	typeref:typename:int
+point_num	LX_tools/lx_tools.h	/^        int32_t point_num;$/;"	m	class:section	typeref:typename:int32_t
+point_num	LX_tools/lx_tools.h	/^        int32_t point_num;$/;"	m	class:section2	typeref:typename:int32_t
+pointcloud	PointCloudCart2Sph/PointCloudCart2Sph.h	/^        pcl::PointCloud<PointT>::Ptr pointcloud;$/;"	m	class:PointCloudCart2Sph	typeref:typename:pcl::PointCloud<PointT>::Ptr
+pointcloud_map_in_cam	depth_img_generate.cpp	/^struct pointcloud_map_in_cam$/;"	s	file:
+pointcloud_map_in_cam_mat	depth_img_generate.cpp	/^    cv::Mat pointcloud_map_in_cam_mat = cv::Mat(Mat_height, Mat_width, CV_32FC1, cv::Scalar(0));$/;"	m	struct:pointcloud_map_in_cam	typeref:typename:cv::Mat	file:
+points	PointCloudCart2Sph/PointCloudCart2Sph.h	/^            std::vector<PointT> points;$/;"	m	struct:PointCloudCart2Sph::Sphgrid	typeref:typename:std::vector<PointT>
+pose	LX_tools/lx_tools.h	/^        float pose[7];$/;"	m	class:section	typeref:typename:float[7]
+pose	LX_tools/lx_tools.h	/^        float pose[7];$/;"	m	class:section2	typeref:typename:float[7]
+pose_matrix	PointCloudCart2Sph/PointCloudCart2Sph.h	/^        Eigen::Matrix4d pose_matrix;$/;"	m	class:PointCloudCart2Sph	typeref:typename:Eigen::Matrix4d
+preinstall	build/Makefile	/^preinstall: all$/;"	t
+preinstall/fast	build/Makefile	/^preinstall\/fast:$/;"	t
+psp	LX_tools/lx_tools.h	/^        PointXYZRGBI* psp;$/;"	m	class:section	typeref:typename:PointXYZRGBI *
+psp	LX_tools/lx_tools.h	/^        PointXYZRGBI* psp;$/;"	m	class:section2	typeref:typename:PointXYZRGBI *
+qnxnto	build/CMakeFiles/3.16.3/CompilerIdC/CMakeCCompilerId.c	/^char const* qnxnto = "INFO" ":" "qnxnto[]";$/;"	v	typeref:typename:char const *
+qnxnto	build/CMakeFiles/3.16.3/CompilerIdCXX/CMakeCXXCompilerId.cpp	/^char const* qnxnto = "INFO" ":" "qnxnto[]";$/;"	v	typeref:typename:char const *
+rad_resolution	depth_img_generate.cpp	/^float rad_resolution = 0.2;$/;"	v	typeref:typename:float
+readSumFile	LX_tools/lx_tool.cpp	/^bool LxTools::readSumFile(const std::string & readFile, $/;"	f	class:LxTools	typeref:typename:bool
+rebuild_cache	build/Makefile	/^rebuild_cache:$/;"	t
+rebuild_cache/fast	build/Makefile	/^rebuild_cache\/fast: rebuild_cache$/;"	t
+resolution_	LX_tools/nerf_pre.h	/^    double resolution_;$/;"	m	class:VoxelDownsampleFilter	typeref:typename:double
+rgba	LX_tools/lx_tools.h	/^    float rgba;$/;"	m	class:PointXYZRGBI	typeref:typename:float
+root_path_	LX_tools/nerf_pre.h	/^    std::string root_path_;$/;"	m	class:NERF_PRE	typeref:typename:std::string
+run	LX_tools/nerf_pre.cpp	/^std::map<int, pcl::PointCloud<pcl::PointXYZRGBL>::Ptr> NERF_PRE::run(std::string lx_file_name, f/;"	f	class:NERF_PRE	typeref:typename:std::map<int,pcl::PointCloud<pcl::PointXYZRGBL>::Ptr>
+run2	LX_tools/nerf_pre.cpp	/^pcl::PointCloud<pcl::PointXYZRGBL>::Ptr NERF_PRE::run2(std::string lx_file_name, std::vector<Eig/;"	f	class:NERF_PRE	typeref:typename:pcl::PointCloud<pcl::PointXYZRGBL>::Ptr
+score	LX_tools/nerf_pre.h	/^        float score;$/;"	m	struct:NERF_PRE::CamPosIndScore	typeref:typename:float
+section	LX_tools/lx_tools.h	/^class section{$/;"	c
+section2	LX_tools/lx_tools.h	/^class section2 {$/;"	c
+status_num	LX_tools/lx_tools.h	/^        int32_t status_num;$/;"	m	class:section	typeref:typename:int32_t
+status_num	LX_tools/lx_tools.h	/^        int32_t status_num;$/;"	m	class:section2	typeref:typename:int32_t
+test	depth_img_generate.cpp	/^void test(pcl::PointCloud<pcl::PointXYZRGBL>::Ptr pointcloud){$/;"	f	typeref:typename:void
+theta_index	PointCloudCart2Sph/PointCloudCart2Sph.h	/^            int theta_index;$/;"	m	struct:PointCloudCart2Sph::Sphgrid	typeref:typename:int
+theta_resolution	PointCloudCart2Sph/PointCloudCart2Sph.h	/^        float theta_resolution;$/;"	m	class:PointCloudCart2Sph	typeref:typename:float
+theta_size	PointCloudCart2Sph/PointCloudCart2Sph.h	/^        int theta_size;$/;"	m	class:PointCloudCart2Sph	typeref:typename:int
+timestamp	LX_tools/lx_tools.h	/^        double timestamp;$/;"	m	class:section	typeref:typename:double
+timestamp	LX_tools/lx_tools.h	/^        double timestamp;$/;"	m	class:section2	typeref:typename:double
+umap	PointCloudCart2Sph/PointCloudCart2Sph.h	/^        std::unordered_map<int, std::string> umap;$/;"	m	class:PointCloudCart2Sph	typeref:typename:std::unordered_map<int,std::string>
+volatile	build/CMakeFiles/3.16.3/CompilerIdC/CMakeCCompilerId.c	/^# define volatile$/;"	d	file:
+voxel_filter	build/Makefile	/^voxel_filter: cmake_check_build_system$/;"	t
+voxel_filter.cpp.i	build/Makefile	/^voxel_filter.cpp.i:$/;"	t
+voxel_filter.cpp.o	build/Makefile	/^voxel_filter.cpp.o:$/;"	t
+voxel_filter.cpp.s	build/Makefile	/^voxel_filter.cpp.s:$/;"	t
+voxel_filter.i	build/Makefile	/^voxel_filter.i: voxel_filter.cpp.i$/;"	t
+voxel_filter.o	build/Makefile	/^voxel_filter.o: voxel_filter.cpp.o$/;"	t
+voxel_filter.s	build/Makefile	/^voxel_filter.s: voxel_filter.cpp.s$/;"	t
+voxel_filter/fast	build/Makefile	/^voxel_filter\/fast:$/;"	t
+x	LX_tools/lx_tools.h	/^    float x;$/;"	m	class:PointXYZRGBI	typeref:typename:float
+y	LX_tools/lx_tools.h	/^    float y;$/;"	m	class:PointXYZRGBI	typeref:typename:float
+z	LX_tools/lx_tools.h	/^    float z;$/;"	m	class:PointXYZRGBI	typeref:typename:float
